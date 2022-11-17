@@ -1,7 +1,7 @@
 public class Business {
-    private final String name;
-    private final int btw;
-    private final String adress;
+    private static String name;
+    private static int btw;
+    private static String adress;
 
     public Business(String name, int btw, String adress) {
         this.name = name;
@@ -9,7 +9,7 @@ public class Business {
         this.adress = adress;
     }
 
-    public String getName() {
+    public static String getName() {
         return name;
     }
 
