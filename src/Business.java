@@ -1,4 +1,7 @@
-public class Business {
+import java.io.Serial;
+import java.io.Serializable;
+
+public class Business implements Serializable {
     private static String name;
     private static int btw;
     private static String adress;

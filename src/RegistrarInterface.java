@@ -4,8 +4,10 @@ import java.rmi.RemoteException;
 public interface RegistrarInterface extends Remote {
 
 
-    String sendInfo(Business b) throws RemoteException;
+    void sendInfo(Business b) throws RemoteException;
 
+
+    void sendString(String s) throws RemoteException;
     //String request() throws RemoteException;
 
 }
