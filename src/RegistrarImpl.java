@@ -73,7 +73,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         System.out.println(testMessages);*/
     }
 
-        public static void main(String args[]) throws Exception {
+    public static void main(String args[]) throws Exception {
         try {
             //System.setProperty("java.rmi.server.hostname", "192.168.1.51");
 
@@ -85,5 +85,29 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             e.printStackTrace();
         }
     }
+
+    public void generateCFPseudonym(Business b, SecretKey s, String location, LocalDate d) throws NoSuchAlgorithmException {
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        String sb = s + location + d;
+        byte[] pseudonym = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
+        registrarDB.setPseudonym(b, pseudonym);
+    }
+
+
+    public String generateQRCode(Business b) throws NoSuchAlgorithmException{
+        int randomNumber=(int) (1000*Math.random());
+        int CF= b.getBtw();
+        byte[] pseudoniem= registrarDB.getPseudonym(b);
+        String pseudoniemstring= new String(pseudoniem, StandardCharsets.UTF_8);
+
+        //hash maken van random number en pseudoniem
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        String s = randomNumber + pseudoniemstring;
+        byte[] QRHash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
+        String finalQRCode=  randomNumber+CF+new String(QRHash, StandardCharsets.UTF_8);
+        System.out.println(finalQRCode);
+        return finalQRCode;
+    }
+
 }
 
