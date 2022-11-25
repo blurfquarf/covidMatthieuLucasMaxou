@@ -85,11 +85,12 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         }
     }
 
-    public void generateCFPseudonym(Business b, SecretKey s, String location, LocalDate d) throws NoSuchAlgorithmException {
+    public byte[] generateCFPseudonym(Business b, SecretKey s, String location, LocalDate d) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         String sb = s + location + d;
         byte[] pseudonym = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
         registrarDB.setPseudonym(b, pseudonym);
+        return pseudonym;
     }
 
 

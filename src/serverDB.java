@@ -11,6 +11,8 @@ public class serverDB {
     private HashMap<Business, LocalDateTime> timestamps;
     private HashMap<Business, byte[]> pseudonyms;
 
+    private HashMap<User, Integer> users;
+
     public serverDB() {
         secretKeys = new HashMap<>();
         timestamps = new HashMap<>();
@@ -47,6 +49,20 @@ public class serverDB {
 
     public void setPseudonym(Business b, byte[] p) {
         pseudonyms.put(b, p);
+    }
+
+    public boolean existsBusiness(int btw) {
+        for (Business b: secretKeys.keySet()) {
+            if (b.getBtw() == btw) return true;
+        }
+        return false;
+    }
+
+    public boolean existsUser(int nr) {
+        for (User u : users.keySet()) {
+            if(u.getPhoneNr()==nr) return true;
+        }
+        return false;
     }
 
    /* public ArrayList<Business> getCfs() {

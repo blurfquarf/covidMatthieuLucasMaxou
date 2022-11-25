@@ -1,3 +1,4 @@
+import javax.crypto.SecretKey;
 import java.io.Serial;
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
@@ -6,9 +7,29 @@ import java.rmi.registry.Registry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.sql.Array;
+import java.time.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.Timer;
 
 public class Catering {
 
+    private ArrayList<SecretKey> secretkeys;
+
+    public static String generateQRCode(Business b, byte[] pseudoniem) throws NoSuchAlgorithmException{
+        int randomNumber=(int) (1000*Math.random());
+        int CF= b.getBtw();
+        String pseudoniemstring= new String(pseudoniem, StandardCharsets.UTF_8);
+
+        //hash maken van random number en pseudoniem
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        String s = randomNumber + pseudoniemstring;
+        byte[] QRHash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
+        String finalQRCode=  randomNumber+CF+new String(QRHash, StandardCharsets.UTF_8);
+        System.out.println(finalQRCode);
+        return finalQRCode;
+    }
 
     public static void main(String[] args) {
 
