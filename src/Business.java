@@ -6,10 +6,14 @@ public class Business implements Serializable {
     private static int btw;
     private static String adress;
 
+    private static int reqCounter;
+
+
     public Business(String name, int btw, String adress) {
         this.name = name;
         this.btw = btw;
         this.adress = adress;
+        reqCounter = 1;
     }
 
     public static String getName() {
@@ -24,6 +28,14 @@ public class Business implements Serializable {
         return adress;
     }
 
+
+    public int getReqCounter() {
+        return reqCounter;
+    }
+
+    public void setReqCounter(int reqCounter) {
+        Business.reqCounter = reqCounter;
+    }
 
 
 }

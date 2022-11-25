@@ -4,6 +4,7 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.PBEParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
@@ -22,78 +23,98 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.time.LocalDate;
 
-public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInterface{
+public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInterface {
 
     //String[] keyTime;
 
     //HashMap<Business, String[]> identifier = new HashMap<>();
+    serverDB registrarDB;
+    SecretKey mk;
 
-    serverDB registrarDB = new serverDB();
-
-
-
-    public RegistrarImpl() throws Exception {
-        super(1099/*, new RMISSLClientSocketFactory(),
-                new RMISSLServerSocketFactory()*/);
+    public RegistrarImpl(serverDB db, SecretKey mk) throws Exception {
+        this.registrarDB = db;
+        this.mk = mk;
+        /* super(1099*//*, new RMISSLClientSocketFactory(),
+                new RMISSLServerSocketFactory()*//*);*/
     }
 
-    public void makeMasterKey(Business b) throws RemoteException, NoSuchAlgorithmException, InvalidKeySpecException {
-        //existsBusiness checks if a business with the same btw Nr already exists if it already exists then the masterkey won't be created
-        //if(!registrarDB.existsBusiness(b.getBtw())) {
-            KeyGenerator kg = KeyGenerator.getInstance("AES");
-            kg.init(128);
-            SecretKey S = kg.generateKey();
-            registrarDB.addIdentifiers(b, S, LocalDateTime.now());
-        //}
+
+    public ArrayList<byte[]> makeInitialSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
+
+        //registrarDB.getTimestamps().put(name, LocalDateTime.now().toString());
+
+        System.out.println("entered Initial Make Secrets");
+        //LocalDateTime dateTime = registrarDB.getTimestamp(name);
+        //System.out.println(dateTime);
+
+        //SecretKey masterSecret = registrarDB.getSecretKey(b);
+        ArrayList<byte[]> derivedKeys = new ArrayList<>();
+
+        for (int i = 0; i < 7; i++) {
+            derivedKeys.add(generateSecretKey(btw, i).getEncoded());
+        }
+
+        for (byte[] b: derivedKeys) {
+            System.out.println(Arrays.toString(b));
+        }
+
+        //System.out.println(Arrays.toString(derivedKeys));
+
+        registrarDB.setLocalDateTime(name, LocalDateTime.now());
+        return derivedKeys;
+
     }
 
-    public ArrayList<SecretKey> makeSecretsForCF(Business b) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public SecretKey generateSecretKey(int btw, int i) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        SecretKeyFactory keyFac = SecretKeyFactory.getInstance("PBEWithHmacSHA256AndAES_256");
+        LocalDateTime currentMoment = LocalDateTime.now().plusMinutes(i);
+        String tempDay = currentMoment.toString();
+
+
+        char[] moment = tempDay.toCharArray();
+
+        //System.out.println(moment);
+
+        byte[] ID = (mk + String.valueOf(btw)).getBytes();
+
+
+        PBEKeySpec pbeKeySpec = new PBEKeySpec(moment, ID, 1000);
+
+        //SecretKey finalSecret = keyFac.generateSecret(pbeKeySpec);
+        return keyFac.generateSecret(pbeKeySpec);
+
+}
+
+        public ArrayList<byte[]> makeSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
         //check if request is not too soon
-        if (registrarDB.getTimestamp(b).isBefore(LocalDateTime.now().minusMinutes(7))){
-            SecretKey masterSecret = registrarDB.getSecretKey(b);
-            ArrayList<SecretKey> derivedKeys = new ArrayList<>();
-            SecretKeyFactory keyFac;
+
+        System.out.println("entered normal Make Secrets");
+        LocalDateTime dateTime = registrarDB.getTimestamp(name);
+
+        if (dateTime.isBefore(LocalDateTime.now().minusMinutes((long) 1.16))){
+            //byte[] ms = registrarDB.getSecretKey(b);
+            //SecretKey masterSecret = new SecretKeySpec(ms, 0, ms.length, "AES");
+
+            //SecretKey masterSecret = registrarDB.getSecretKey(b);
+            ArrayList<byte[]> derivedKeys = new ArrayList<>();
 
             for (int i = 0; i < 7; i++) {
-                LocalDateTime currentDay = LocalDateTime.now().plusMinutes(i);
-                String tempDay = currentDay.toString();
-                byte[] day = tempDay.getBytes();
-                char[] ID = (masterSecret + String.valueOf(b.getBtw())).toCharArray();
-                PBEKeySpec pbeKeySpec = new PBEKeySpec(ID, day, 1000);
-                keyFac = SecretKeyFactory.getInstance("PBEWithHmacSHA256AndAES_256");
-                SecretKey finalSecret = keyFac.generateSecret(pbeKeySpec);
-                derivedKeys.add(finalSecret);
-        }
-            registrarDB.setLocalDateTime(b, LocalDateTime.now());
+                derivedKeys.add(generateSecretKey(btw, i).getEncoded());
+            }
+            registrarDB.setLocalDateTime(name, LocalDateTime.now());
             return derivedKeys;
     }
-        ArrayList<SecretKey> emptyList = new ArrayList<>();
-    return emptyList;
+        ArrayList<byte[]> emptyList = new ArrayList<>();
+        return emptyList;
     }
 
 
-    public static void main(String args[]) throws Exception {
-        try {
-            //System.setProperty("java.rmi.server.hostname", "192.168.1.51");
-
-            Registry registry = LocateRegistry.createRegistry(1099/*, new RMISSLClientSocketFactory(), new RMISSLServerSocketFactory()*/);
-            registry.rebind("RegistrarService", new RegistrarImpl());
-            System.out.println("system is ready");
-        }
-         catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public byte[] generateCFPseudonym(Business b, SecretKey s, String location, LocalDate d) throws NoSuchAlgorithmException {
+    public byte[] generateCFPseudonym(String  name, byte[] s, String location, LocalDateTime d) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         String sb = s + location + d;
         byte[] pseudonym = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
-        registrarDB.setPseudonym(b, pseudonym);
+        registrarDB.setPseudonym(name, pseudonym);
         return pseudonym;
     }
-
-
-
 }
 

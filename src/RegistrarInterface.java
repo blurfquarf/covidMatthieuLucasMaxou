@@ -4,13 +4,18 @@ import java.rmi.RemoteException;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 
 public interface RegistrarInterface extends Remote {
 
-    void makeMasterKey(Business b) throws RemoteException, NoSuchAlgorithmException, InvalidKeySpecException;
+    ArrayList<byte[]> makeSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException, RemoteException;
 
-    ArrayList<SecretKey> makeSecretsForCF(Business b) throws NoSuchAlgorithmException, InvalidKeySpecException;
+    byte[] generateCFPseudonym(String name, byte[] s, String location, LocalDateTime d) throws NoSuchAlgorithmException, RemoteException;
 
-    byte[] generateCFPseudonym(Business b, SecretKey s, String location, LocalDate d) throws NoSuchAlgorithmException;
+    ArrayList<byte[]> makeInitialSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException, RemoteException;
+
+
 }
+
+

@@ -10,6 +10,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.sql.Array;
 import java.time.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Scanner;
 import java.util.Timer;
 
@@ -36,12 +37,17 @@ public class Catering {
         Business testBusiness = new Business("bert", 123321, "Gent");
         int newKeyInterval = 7;
 
+        String name = "YAKINOODDDLLL";
+        int btw = 69;
+        String adress = "kakastraat";
+
+
         try{
             Registry myRegistry = LocateRegistry.getRegistry("localhost",
                     1099/*, new RMISSLClientSocketFactory()*/);
             RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
 
-
+/*
             Thread mk = new Thread() {
                 public void run(){
                     try {
@@ -58,13 +64,27 @@ public class Catering {
 
             Thread req = new Thread(() -> {
                 try {
-                    ArrayList<SecretKey> derivedKeys = new ArrayList<>();
-                    ArrayList<SecretKey> oldKeys = new ArrayList<>();
+                    //registrarImpl.makeMasterKey(testBusiness);
+                    ArrayList<byte[]> derivedKeys = new ArrayList<>();
+                    ArrayList<byte[]> oldKeys = new ArrayList<>();
+
+                    derivedKeys = registrarImpl.makeInitialSecretsForCF(name, btw, adress);
+
+                    for (byte[] b: derivedKeys) {
+                        System.out.println(Arrays.toString(b));
+                    }
+
+                    Thread.sleep(70000);
 
                     while(true) {
-                        derivedKeys = registrarImpl.makeSecretsForCF(testBusiness);
+                        //System.out.println(testBusiness.getBtw());
 
-                        System.out.println(derivedKeys);
+                        //System.out.println(testBusiness);
+                        derivedKeys = registrarImpl.makeSecretsForCF(name, btw, adress);
+
+                        for (byte[] b: derivedKeys) {
+                            System.out.println(Arrays.toString(b));
+                        }
 
                         //if request is sent to early, an empty list is returned
                         //check if te returned list is bigger than the current list
@@ -76,13 +96,17 @@ public class Catering {
                         }
                         else derivedKeys = new ArrayList<>(oldKeys);
 
-                        for (SecretKey s : derivedKeys) {
+                        for (byte[] s : derivedKeys) {
                             //for every key in the list we use 1 every minute (read day)
                             //when a key is used we remove it from the list, so it cannot be reused
-                            byte[] pseudonym = registrarImpl.generateCFPseudonym(testBusiness,s, testBusiness.getAdress(), LocalDate.from(LocalTime.now()));
+                            byte[] pseudonym = registrarImpl.generateCFPseudonym(name, s, adress, LocalDateTime.now());
+
+
+                            System.out.println(pseudonym);
+
                             QRCodes.add(generateQRCode(testBusiness, pseudonym));
                             oldKeys.remove(s);
-                            Thread.sleep(3600);
+                            Thread.sleep(10000);
                         }
                     }
                 } catch (Exception e) {
