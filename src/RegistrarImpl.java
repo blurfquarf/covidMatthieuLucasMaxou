@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.time.LocalDate;
 
@@ -111,7 +112,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
     public byte[] generateCFPseudonym(String  name, byte[] s, String location, LocalDateTime d) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        String sb = s + location + d;
+        String sb = Arrays.toString(s) + location + d;
         byte[] pseudonym = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
         registrarDB.setPseudonym(name, pseudonym);
         return pseudonym;

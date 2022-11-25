@@ -57,12 +57,12 @@ public class serverDB {
         timestamps.put(bNaam, d);
     }
 
-    public byte[] getPseudonym(Business b) {
-        return pseudonyms.get(b);
+    public byte[] getPseudonym(String bNaam) {
+        return pseudonyms.get(bNaam);
     }
 
-    public void setPseudonym(Business b, byte[] p) {
-        pseudonyms.put(b, p);
+    public void setPseudonym(String bNaam, byte[] p) {
+        pseudonyms.put(bNaam, p);
     }
 
  /*   public boolean existsBusiness(int btw) {
@@ -73,8 +73,8 @@ public class serverDB {
     }*/
 
     public boolean existsUser(int nr) {
-        for (User u : users.keySet()) {
-            if(u.getPhoneNr()==nr) return true;
+        for (Integer u : users.keySet()) {
+            if(u==nr) return true;
         }
         return false;
     }

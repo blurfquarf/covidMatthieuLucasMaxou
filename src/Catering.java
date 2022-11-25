@@ -57,7 +57,8 @@ public class Catering {
                     }
                 }
             };
-            mk.start();
+            mk.start();*/
+
 
             ArrayList<String> QRCodes = new ArrayList<>();
 
