@@ -1,6 +1,5 @@
 import javax.crypto.SecretKey;
-import java.time.LocalDate;
-import java.util.ArrayList;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 
 public class serverDB {
@@ -8,7 +7,8 @@ public class serverDB {
     //lijsten stellen kolommen in databank voor
 
     private HashMap<Business, SecretKey> secretKeys;
-    private HashMap<Business, LocalDate> timestamps;
+
+    private HashMap<Business, LocalDateTime> timestamps;
     private HashMap<Business, byte[]> pseudonyms;
 
     public serverDB() {
@@ -17,10 +17,11 @@ public class serverDB {
         pseudonyms = new HashMap<>();
     }
 
-    public void addIdentifiers(Business b, SecretKey k, LocalDate t) {
+    public void addIdentifiers(Business b, SecretKey k, LocalDateTime t) {
         secretKeys.put(b,k);
         timestamps.put(b,t);
     }
+
 
     public void deleteCF(Business b){
         secretKeys.remove(b);
@@ -32,11 +33,11 @@ public class serverDB {
         return secretKeys.get(b);
     }
 
-    public LocalDate getTimestamp(Business b) {
+    public LocalDateTime getTimestamp(Business b) {
         return timestamps.get(b);
     }
 
-    public void setLocalDate(Business b, LocalDate d) {
+    public void setLocalDateTime(Business b, LocalDateTime d) {
         timestamps.put(b, d);
     }
 

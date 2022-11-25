@@ -16,6 +16,7 @@ import java.security.Timestamp;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -36,42 +37,40 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
                 new RMISSLServerSocketFactory()*/);
     }
 
-    public void sendInfo(Business b) throws RemoteException{
-    }
-
     public void makeMasterKey(Business b) throws RemoteException, NoSuchAlgorithmException, InvalidKeySpecException {
-        KeyGenerator kg = KeyGenerator.getInstance("AES");
-        kg.init(128);
-        SecretKey S = kg.generateKey();
-
-        registrarDB.addIdentifiers(b, S, LocalDate.now());
-
-        ArrayList<SecretKey> derivedKeys = makeSecretsForCF(b);
+        //existsBusiness checks if a business with the same btw Nr already exists if it already exists then the masterkey won't be created
+        //if(!registrarDB.existsBusiness(b.getBtw())) {
+            KeyGenerator kg = KeyGenerator.getInstance("AES");
+            kg.init(128);
+            SecretKey S = kg.generateKey();
+            registrarDB.addIdentifiers(b, S, LocalDateTime.now());
+        //}
     }
 
     public ArrayList<SecretKey> makeSecretsForCF(Business b) throws NoSuchAlgorithmException, InvalidKeySpecException {
+        //check if request is not too soon
+        if (registrarDB.getTimestamp(b).isBefore(LocalDateTime.now().minusMinutes(7))){
+            SecretKey masterSecret = registrarDB.getSecretKey(b);
+            ArrayList<SecretKey> derivedKeys = new ArrayList<>();
+            SecretKeyFactory keyFac;
 
-        SecretKey masterSecret = registrarDB.getSecretKey(b);
-        ArrayList<SecretKey> derivedKeys = new ArrayList<>();
-        SecretKeyFactory keyFac;
-
-        for (int i = 0; i < 7; i++) {
-            LocalDate currentDay = LocalDate.now().plusDays(i);
-            String tempDay = currentDay.toString();
-            byte[] day = tempDay.getBytes();
-            char[] ID = (masterSecret + String.valueOf(b.getBtw())).toCharArray();
-            PBEKeySpec pbeKeySpec = new PBEKeySpec(ID, day, 1000);
-            keyFac = SecretKeyFactory.getInstance("PBEWithHmacSHA256AndAES_256");
-            SecretKey finalSecret = keyFac.generateSecret(pbeKeySpec);
-            derivedKeys.add(finalSecret);
+            for (int i = 0; i < 7; i++) {
+                LocalDateTime currentDay = LocalDateTime.now().plusMinutes(i);
+                String tempDay = currentDay.toString();
+                byte[] day = tempDay.getBytes();
+                char[] ID = (masterSecret + String.valueOf(b.getBtw())).toCharArray();
+                PBEKeySpec pbeKeySpec = new PBEKeySpec(ID, day, 1000);
+                keyFac = SecretKeyFactory.getInstance("PBEWithHmacSHA256AndAES_256");
+                SecretKey finalSecret = keyFac.generateSecret(pbeKeySpec);
+                derivedKeys.add(finalSecret);
         }
-        return derivedKeys;
+            registrarDB.setLocalDateTime(b, LocalDateTime.now());
+            return derivedKeys;
+    }
+        ArrayList<SecretKey> emptyList = new ArrayList<>();
+    return emptyList;
     }
 
-    public void sendString(String s) throws RemoteException {
-        /*testMessages.add(s);
-        System.out.println(testMessages);*/
-    }
 
     public static void main(String args[]) throws Exception {
         try {
