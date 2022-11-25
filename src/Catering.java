@@ -1,7 +1,9 @@
 import java.io.Serial;
+import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
+import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
@@ -11,6 +13,7 @@ public class Catering {
     public static void main(String[] args) {
 
         Business testBusiness = new Business("bert", 123321, "Gent");
+        int newKeyInterval = 7;
 
         try{
             Registry myRegistry = LocateRegistry.getRegistry("localhost",

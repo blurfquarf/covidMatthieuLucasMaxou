@@ -93,20 +93,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     }
 
 
-    public String generateQRCode(Business b) throws NoSuchAlgorithmException{
-        int randomNumber=(int) (1000*Math.random());
-        int CF= b.getBtw();
-        byte[] pseudoniem= registrarDB.getPseudonym(b);
-        String pseudoniemstring= new String(pseudoniem, StandardCharsets.UTF_8);
-
-        //hash maken van random number en pseudoniem
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        String s = randomNumber + pseudoniemstring;
-        byte[] QRHash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
-        String finalQRCode=  randomNumber+CF+new String(QRHash, StandardCharsets.UTF_8);
-        System.out.println(finalQRCode);
-        return finalQRCode;
-    }
 
 }
 
