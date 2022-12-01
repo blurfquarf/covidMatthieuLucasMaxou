@@ -19,7 +19,7 @@ public class serverDB {
     private HashMap<String, LocalDateTime> timestamps;
     private HashMap<String, byte[]> pseudonyms;
 
-    private HashMap<Integer, Integer> days;
+    private HashMap<String, Integer> days;
 
     private ArrayList<String> registeredPhonenumbers;
 
@@ -31,6 +31,7 @@ public class serverDB {
         timestamps = new HashMap<>();
         pseudonyms = new HashMap<>();
         tokenMappings = new HashMap<>();
+        days = new HashMap<>();
     }
 
     public HashMap<String, LocalDateTime> getTimestamps() {
@@ -84,14 +85,9 @@ public class serverDB {
         return tokenMappings;
     }
 
-    public void setDays(int btw, int day){
+    public void setDays(String btw, int day){
         days.put(btw, day);
     }
-
-
-
-
-
 
 
 }

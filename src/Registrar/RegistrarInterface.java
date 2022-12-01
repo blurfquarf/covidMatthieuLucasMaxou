@@ -24,7 +24,7 @@ public interface RegistrarInterface extends Remote {
 
     PublicKey getPK() throws RemoteException;
 
-    void setDay(int btw, int day) throws RemoteException;
+    //void setDay(int btw, int day) throws RemoteException;
 }
 
 
