@@ -2,6 +2,7 @@ package Registrar;
 
 import javax.crypto.SecretKey;
 import java.security.Key;
+import java.security.Signature;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
@@ -90,17 +91,6 @@ public class serverDB {
 
 
 
-    public void setSecretKeys(ArrayList<SecretKey> secretKeys) {
-        this.secretKeys = secretKeys;
-    }
-
-    public ArrayList<LocalDate> getTimestamps() {
-        return timestamps;
-    }
-
-    public void setTimestamps(ArrayList<LocalDate> timestamps) {
-        this.timestamps = timestamps;
-    }*/
 
 
 

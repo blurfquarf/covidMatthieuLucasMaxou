@@ -3,11 +3,12 @@ package Registrar;
 import javax.crypto.SecretKey;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Map;
 
 public interface RegistrarInterface extends Remote {
 
@@ -19,6 +20,11 @@ public interface RegistrarInterface extends Remote {
 
     Map<byte[], byte[]> generateTokens(String telefoonnr) throws NoSuchAlgorithmException, RemoteException, InvalidKeyException, SignatureException;
 
+    boolean getUserByPhone(String phoneNR) throws RemoteException;
+
+    PublicKey getPK() throws RemoteException;
+
+    void setDay(int btw, int day) throws RemoteException;
 }
 
 

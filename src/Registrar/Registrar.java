@@ -9,19 +9,30 @@ import java.security.spec.RSAKeyGenParameterSpec;
 
 public class Registrar {
 
-    public static SecretKey makeMasterKey() throws NoSuchAlgorithmException {
+   /* public static SecretKey makeMasterKey() throws NoSuchAlgorithmException {
         //existsBusiness checks if a business with the same btw Nr already exists if it already exists then the masterkey won't be created
         //if(!registrarDB.existsBusiness(b.getBtw())) {
         KeyGenerator kg = KeyGenerator.getInstance("AES");
         kg.init(128);
         SecretKey S = kg.generateKey();
         return S;
-    }
+    }*/
+
+
     private void run() { try {
             //System.setProperty("java.rmi.server.hostname", "192.168.1.51");
 
+
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
+        KeyPair pair = kpg.generateKeyPair();
+
+
         serverDB registrarDB = new serverDB();
-        SecretKey serverSK = makeMasterKey();
+        PrivateKey serverSK = pair.getPrivate();
+        PublicKey serverPK = pair.getPublic();
+
+
 
         Registry registry = LocateRegistry.createRegistry(1099);
             registry.rebind("RegistrarService", new RegistrarImpl(registrarDB, serverSK, serverPK));

@@ -11,17 +11,13 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-import java.security.Timestamp;
+import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
+import java.util.*;
 import java.time.LocalDate;
 import java.nio.ByteBuffer;
 
@@ -32,13 +28,29 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
     //HashMap<Business, String[]> identifier = new HashMap<>();
     serverDB registrarDB;
-    SecretKey mk;
+    PrivateKey mk;
+    PublicKey pk;
 
-    public RegistrarImpl(serverDB db, SecretKey mk) throws Exception {
+    public RegistrarImpl(serverDB db, PrivateKey mk, PublicKey pk) throws Exception {
         this.registrarDB = db;
         this.mk = mk;
         this.pk = pk;
     }
+
+
+    public PublicKey getServerPK(){
+        return pk;
+    }
+
+
+
+    public boolean getUserByPhone(String PhoneNR){
+        if (registrarDB.getRegisteredPhonenumbers().contains(PhoneNR)) {
+            return true;
+        }
+        return false;
+    }
+
 
 
     public ArrayList<byte[]> makeInitialSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -101,7 +113,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
             //SecretKey masterSecret = registrarDB.getSecretKey(b);
             ArrayList<byte[]> derivedKeys = new ArrayList<>();
-
             for (int i = 0; i < 7; i++) {
                 derivedKeys.add(generateSecretKey(btw, i).getEncoded());
             }
@@ -113,9 +124,9 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     }
 
 
-    public byte[] generateCFPseudonym(String  name, byte[] s, String location, LocalDateTime d) throws NoSuchAlgorithmException {
+    public byte[] generateCFPseudonym(String name, byte[] s, String location, int day) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        String sb = Arrays.toString(s) + location + d;
+        String sb = Arrays.toString(s) + location + day;
         byte[] pseudonym = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
         registrarDB.setPseudonym(name, pseudonym);
         return pseudonym;

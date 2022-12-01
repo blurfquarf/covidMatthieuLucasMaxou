@@ -7,18 +7,24 @@ import java.rmi.registry.Registry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.time.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Scanner;
-import java.util.Timer;
+import java.util.*;
 
 public class Catering {
 
     private ArrayList<SecretKey> secretkeys;
 
-    public static String generateQRCode(Business b, byte[] pseudoniem) throws NoSuchAlgorithmException{
-        int randomNumber=(int) (1000*Math.random());
-        int CF= b.getBtw();
+    public static String generateQRCode(int btw, byte[] pseudoniem) throws NoSuchAlgorithmException{
+
+
+        //random nummer max 4 cijfers
+        Random rand = new Random();
+        int randomNumber = rand.nextInt(9999-1000) + 1000;
+
+        //int randomNumber=(int) (1000*Math.random());
+        int CF= btw;
+
+
+
         String pseudoniemstring= new String(pseudoniem, StandardCharsets.UTF_8);
 
         //hash maken van random number en pseudoniem
@@ -35,13 +41,23 @@ public class Catering {
 
     public static void main(String[] args) {
 
-        Business testBusiness = new Business("bert", 123321, "Gent");
-        int newKeyInterval = 7;
+        Scanner sc = new Scanner(System.in);
+        System.out.println("enter catering name:");
+        String name = sc.nextLine();
 
-        String name = "YAKINOODDDLLL";
-        int btw = 69;
-        String adress = "kakastraat";
+        System.out.println("enter btw number (6 digits):");
+        String voorlopig = sc.nextLine();
+        while(voorlopig.length() != 6){
+            System.out.println("enter btw number (6 digits):");
+            voorlopig = sc.nextLine();
+        }
 
+        int btw = Integer.parseInt(voorlopig);
+        System.out.println("enter business adress:");
+        String adress = sc.nextLine();
+
+
+        System.out.println("registered, app running!");
 
         try{
             Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
@@ -71,7 +87,7 @@ public class Catering {
 
                     derivedKeys = registrarImpl.makeInitialSecretsForCF(name, btw, adress);
 
-                    for (byte[] b: derivedKeys) {
+                   /* for (byte[] b: derivedKeys) {
                         System.out.println(Arrays.toString(b));
                     }*/
 
@@ -91,9 +107,9 @@ public class Catering {
                         //System.out.println(testBusiness);
                         derivedKeys = registrarImpl.makeSecretsForCF(name, btw, adress);
 
-                        for (byte[] b: derivedKeys) {
+                        /*for (byte[] b: derivedKeys) {
                             System.out.println(Arrays.toString(b));
-                        }
+                        }*/
 
                         //if request is sent to early, an empty list is returned
                         //check if te returned list is bigger than the current list
@@ -105,6 +121,11 @@ public class Catering {
                         }
                         else derivedKeys = new ArrayList<>(oldKeys);
 
+                        String QRCode = "";
+
+                        //where is this catering in its cycle of 7 days
+                        int day = 1;
+
                         for (byte[] s : derivedKeys) {
                             //for every key in the list we use 1 every minute (read day)
                             //when a key is used we remove it from the list, so it cannot be reused
@@ -112,10 +133,19 @@ public class Catering {
 
                             System.out.println(pseudonym);
 
-                            QRCodes.add(generateQRCode(testBusiness, pseudonym));
+                            //prints QR code every single day, visible to clients
+                            QRCode = generateQRCode(btw, pseudonym);
+                            registrarImpl.setDay(btw, day);
+
+                            day++;
+
                             oldKeys.remove(s);
-                            Thread.sleep(10000);
+
+                            //should be 120000
+                            Thread.sleep(120000);
                         }
+
+
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
