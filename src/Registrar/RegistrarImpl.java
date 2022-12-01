@@ -1,4 +1,4 @@
-//import java.rmi.RMISecurityManager;
+package Registrar;//import java.rmi.RMISecurityManager;
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
@@ -23,6 +23,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.time.LocalDate;
+import java.nio.ByteBuffer;
+
 
 public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInterface {
 
@@ -35,8 +37,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     public RegistrarImpl(serverDB db, SecretKey mk) throws Exception {
         this.registrarDB = db;
         this.mk = mk;
-        /* super(1099*//*, new RMISSLClientSocketFactory(),
-                new RMISSLServerSocketFactory()*//*);*/
+        this.pk = pk;
     }
 
 
@@ -92,7 +93,9 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         System.out.println("entered normal Make Secrets");
         LocalDateTime dateTime = registrarDB.getTimestamp(name);
 
-        if (dateTime.isBefore(LocalDateTime.now().minusMinutes((long) 1.16))){
+
+        //should be 14
+        if (dateTime.isBefore(LocalDateTime.now().minusMinutes((long) 13.9))){
             //byte[] ms = registrarDB.getSecretKey(b);
             //SecretKey masterSecret = new SecretKeySpec(ms, 0, ms.length, "AES");
 
@@ -117,5 +120,60 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         registrarDB.setPseudonym(name, pseudonym);
         return pseudonym;
     }
+
+    public Map<byte[], byte[]> generateTokens(String telefoonnr) throws NoSuchAlgorithmException,
+            RemoteException, InvalidKeyException, SignatureException {
+
+        MessageDigest digest = MessageDigest.getInstance("SHA-256");
+        Map<byte[], byte[]> ts = new HashMap<>();
+        for (int i = 0; i < 48; i++) {
+            double randomNumber = Math.random()*1000;
+            LocalDate today = LocalDate.now();
+            byte[] todayByteArray = today.toString().getBytes(StandardCharsets.UTF_8);
+            //maak tokens en voeg deze toe aan de tokenMapping in de Registrar.serverDB
+            byte[] date = today.toString().getBytes(StandardCharsets.UTF_8);
+            date.toString();
+            String sb = Double.toString(randomNumber);
+            byte[] randomByteArray = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
+            byte[] token = joinByteArray(todayByteArray, randomByteArray);
+
+
+            //signing with the private masterkey
+            Signature signatureEngine = Signature.getInstance("SHA1withRSA");
+            signatureEngine.initSign(mk);
+            signatureEngine.update(token);
+
+
+            //TODO ADD CURRENT DAY (2min period)
+            byte[] signature = signatureEngine.sign();
+
+
+
+            ts.put(token, signature);
+            registrarDB.getTokenMappings().put(token, telefoonnr);
+        }
+        return ts;
+    }
+
+
+    public static byte[] joinByteArray(byte[] byte1, byte[] byte2) {
+
+        return ByteBuffer.allocate(byte1.length + byte2.length)
+                .put(byte1)
+                .put(byte2)
+                .array();
+
+    }
+
+    public PublicKey getPK() throws RemoteException{
+        return pk;
+    }
+
+    public void setDay(int btw, int day) throws RemoteException{
+        registrarDB.setDays(btw, day);
+    }
+
+
+
 }
 

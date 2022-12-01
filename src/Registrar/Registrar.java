@@ -1,11 +1,11 @@
+package Registrar;
+
 import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
+import java.security.*;
+import java.security.spec.RSAKeyGenParameterSpec;
 
 public class Registrar {
 
@@ -23,8 +23,8 @@ public class Registrar {
         serverDB registrarDB = new serverDB();
         SecretKey serverSK = makeMasterKey();
 
-        Registry registry = LocateRegistry.createRegistry(1099/*, new RMISSLClientSocketFactory(), new RMISSLServerSocketFactory()*/);
-            registry.rebind("RegistrarService", new RegistrarImpl(registrarDB, serverSK));
+        Registry registry = LocateRegistry.createRegistry(1099);
+            registry.rebind("RegistrarService", new RegistrarImpl(registrarDB, serverSK, serverPK));
             System.out.println("system is ready");
         }
         catch (Exception e) {

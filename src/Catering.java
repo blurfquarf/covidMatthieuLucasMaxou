@@ -1,13 +1,11 @@
+import Registrar.RegistrarInterface;
+
 import javax.crypto.SecretKey;
-import java.io.Serial;
 import java.nio.charset.StandardCharsets;
-import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.spec.InvalidKeySpecException;
-import java.sql.Array;
 import java.time.*;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -27,7 +25,10 @@ public class Catering {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         String s = randomNumber + pseudoniemstring;
         byte[] QRHash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
-        String finalQRCode=  randomNumber+CF+new String(QRHash, StandardCharsets.UTF_8);
+
+
+        //geen probleem van string parseable te maken
+        String finalQRCode=  randomNumber + CF + new String(QRHash, StandardCharsets.UTF_8);
         System.out.println(finalQRCode);
         return finalQRCode;
     }
@@ -43,8 +44,7 @@ public class Catering {
 
 
         try{
-            Registry myRegistry = LocateRegistry.getRegistry("localhost",
-                    1099/*, new RMISSLClientSocketFactory()*/);
+            Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
             RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
 
 /*
@@ -73,9 +73,17 @@ public class Catering {
 
                     for (byte[] b: derivedKeys) {
                         System.out.println(Arrays.toString(b));
-                    }
+                    }*/
 
-                    Thread.sleep(70000);
+
+
+
+
+
+
+
+                    //should be 840000ms
+                    Thread.sleep(840000);
 
                     while(true) {
                         //System.out.println(testBusiness.getBtw());
@@ -100,8 +108,7 @@ public class Catering {
                         for (byte[] s : derivedKeys) {
                             //for every key in the list we use 1 every minute (read day)
                             //when a key is used we remove it from the list, so it cannot be reused
-                            byte[] pseudonym = registrarImpl.generateCFPseudonym(name, s, adress, LocalDateTime.now());
-
+                            byte[] pseudonym = registrarImpl.generateCFPseudonym(name, s, adress, day);
 
                             System.out.println(pseudonym);
 

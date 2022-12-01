@@ -1,8 +1,12 @@
+package Registrar;
+
 import javax.crypto.SecretKey;
 import java.security.Key;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class serverDB {
 
@@ -14,12 +18,18 @@ public class serverDB {
     private HashMap<String, LocalDateTime> timestamps;
     private HashMap<String, byte[]> pseudonyms;
 
-    private HashMap<Integer, Integer> users;
+    private HashMap<Integer, Integer> days;
+
+    private ArrayList<String> registeredPhonenumbers;
+
+    //tokenmapping by phone number
+    private HashMap<byte[], String> tokenMappings;
 
     public serverDB() {
         //secretKeys = new HashMap<>();
         timestamps = new HashMap<>();
         pseudonyms = new HashMap<>();
+        tokenMappings = new HashMap<>();
     }
 
     public HashMap<String, LocalDateTime> getTimestamps() {
@@ -49,6 +59,10 @@ public class serverDB {
         return secretKeys.get(b);
     }*/
 
+    public ArrayList<String> getRegisteredPhonenumbers(){
+        return registeredPhonenumbers;
+    }
+
     public LocalDateTime getTimestamp(String bNaam) {
         return timestamps.get(bNaam);
     }
@@ -65,31 +79,16 @@ public class serverDB {
         pseudonyms.put(bNaam, p);
     }
 
- /*   public boolean existsBusiness(int btw) {
-        for (Business b: secretKeys.keySet()) {
-            if (b.getBtw() == btw) return true;
-        }
-        return false;
-    }*/
-
-    public boolean existsUser(int nr) {
-        for (Integer u : users.keySet()) {
-            if(u==nr) return true;
-        }
-        return false;
+    public Map<byte[], String> getTokenMappings(){
+        return tokenMappings;
     }
 
-   /* public ArrayList<Business> getCfs() {
-        return Cfs;
+    public void setDays(int btw, int day){
+        days.put(btw, day);
     }
 
-    public void setCfs(ArrayList<Business> cfs) {
-        Cfs = cfs;
-    }
 
-    public ArrayList<SecretKey> getSecretKeys() {
-        return secretKeys;
-    }
+
 
     public void setSecretKeys(ArrayList<SecretKey> secretKeys) {
         this.secretKeys = secretKeys;
