@@ -55,28 +55,16 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
     public ArrayList<byte[]> makeInitialSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
-        //registrarDB.getTimestamps().put(name, LocalDateTime.now().toString());
-
         System.out.println("entered Initial Make Secrets");
-        //LocalDateTime dateTime = registrarDB.getTimestamp(name);
-        //System.out.println(dateTime);
 
-        //SecretKey masterSecret = registrarDB.getSecretKey(b);
         ArrayList<byte[]> derivedKeys = new ArrayList<>();
 
         for (int i = 0; i < 7; i++) {
             derivedKeys.add(generateSecretKey(btw, i).getEncoded());
         }
 
-        for (byte[] b: derivedKeys) {
-            System.out.println(Arrays.toString(b));
-        }
-
-        //System.out.println(Arrays.toString(derivedKeys));
-
         registrarDB.setLocalDateTime(name, LocalDateTime.now());
         return derivedKeys;
-
     }
 
     public SecretKey generateSecretKey(int btw, int i) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -129,6 +117,9 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         String sb = Arrays.toString(s) + location + day;
         byte[] pseudonym = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
         registrarDB.setPseudonym(name, pseudonym);
+
+        registrarDB.setDays(name, day);
+
         return pseudonym;
     }
 
@@ -179,12 +170,4 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     public PublicKey getPK() throws RemoteException{
         return pk;
     }
-
-    public void setDay(int btw, int day) throws RemoteException{
-        registrarDB.setDays(btw, day);
-    }
-
-
-
 }
-

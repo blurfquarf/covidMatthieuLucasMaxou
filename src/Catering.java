@@ -63,20 +63,6 @@ public class Catering {
             Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
             RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
 
-/*
-            Thread mk = new Thread() {
-                public void run(){
-                    try {
-                        registrarImpl.makeMasterKey(testBusiness);
-                    } catch (RemoteException | NoSuchAlgorithmException | InvalidKeySpecException e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            };
-            mk.start();*/
-            
-            ArrayList<String> QRCodes = new ArrayList<>();
-
 
             Thread req = new Thread(() -> {
                 try {
@@ -86,19 +72,32 @@ public class Catering {
 
                     derivedKeys = registrarImpl.makeInitialSecretsForCF(name, btw, adress);
 
-                   /* for (byte[] b: derivedKeys) {
-                        System.out.println(Arrays.toString(b));
-                    }*/
+                    String QRCode = "";
 
+                    int day = 1;
 
+                    for (byte[] s : derivedKeys) {
+                        //for every key in the list we use 1 every minute (read day)
+                        //when a key is used we remove it from the list, so it cannot be reused
+                        byte[] pseudonym = registrarImpl.generateCFPseudonym(name, s, adress, day);
 
+                        System.out.println(pseudonym);
 
+                        //prints QR code every single day, visible to clients
+                        QRCode = generateQRCode(btw, pseudonym);
+                        //registrarImpl.setDay(btw, day);
 
+                        day++;
 
+                        oldKeys.remove(s);
+
+                        //should be 120000
+                        Thread.sleep(120000);
+                    }
 
 
                     //should be 840000ms
-                    Thread.sleep(840000);
+                    //Thread.sleep(840000);
 
                     while(true) {
                         //System.out.println(testBusiness.getBtw());
@@ -120,10 +119,9 @@ public class Catering {
                         }
                         else derivedKeys = new ArrayList<>(oldKeys);
 
-                        String QRCode = "";
 
                         //where is this catering in its cycle of 7 days
-                        int day = 1;
+                        day = 1;
 
                         for (byte[] s : derivedKeys) {
                             //for every key in the list we use 1 every minute (read day)
@@ -134,7 +132,7 @@ public class Catering {
 
                             //prints QR code every single day, visible to clients
                             QRCode = generateQRCode(btw, pseudonym);
-                            registrarImpl.setDay(btw, day);
+                            //registrarImpl.setDay(btw, day);
 
                             day++;
 
