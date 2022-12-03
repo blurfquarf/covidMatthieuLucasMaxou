@@ -74,8 +74,7 @@ public class Catering {
                 }
             };
             mk.start();*/
-
-
+            
             ArrayList<String> QRCodes = new ArrayList<>();
 
 

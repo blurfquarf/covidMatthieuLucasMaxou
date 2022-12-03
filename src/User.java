@@ -1,4 +1,6 @@
 import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -9,14 +11,18 @@ import java.util.Set;
 public class User {
 
     private String phoneNr;
+    private PrivateKey privk;
+    private PublicKey pubk;
     private HashMap<String, QROutput> visitEntries = new HashMap<>();
     //hoe lang elke capsule bewaard moet worden
     private int duration = 7;
 
     private ArrayList<byte[]> tokens = new ArrayList<>();
 
-    User(String nr) {
+    User(String nr, PrivateKey a, PublicKey b) {
         this.phoneNr = nr;
+        this.privk = a;
+        this.pubk = b;
     }
 
     public String getPhoneNr() {
@@ -42,15 +48,17 @@ public class User {
                 token = temp;
                 found = true;
             }
-            else {
-                tokens.remove(0);
-            }
+            //if token is invalid or used -> remove token
+            tokens.remove(0);
         }
         return token;
     }
 
+    public PrivateKey getPrivk() {
+        return privk;
+    }
 
-
-
-
+    public PublicKey getPubk() {
+        return pubk;
+    }
 }

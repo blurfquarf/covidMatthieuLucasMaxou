@@ -1,20 +1,19 @@
-package MixingServer;
+package MatchingService;
 
+import MixingServer.MixingServer;
+import MixingServer.MixingServerImpl;
 import Registrar.RegistrarInterface;
 
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.security.Signature;
-import java.util.Iterator;
-import java.util.Map;
 
-public class MixingServer {
+public class MatchingService {
 
     private void run() { try {
 
         Registry registry = LocateRegistry.createRegistry(1099);
-        registry.rebind("MixingService", new MixingServerImpl());
-        System.out.println("Mixing system  is ready");
+        registry.rebind("MatchingService", new MatchingServiceImpl());
+        System.out.println("Matching Service is ready");
 
 
         Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
@@ -33,13 +32,13 @@ public class MixingServer {
 
 
     }catch (Exception e){
-            e.printStackTrace();
-        }
+        e.printStackTrace();
+    }
     }
 
     public static void main(String[] args) {
 
-        MixingServer main =  new MixingServer();
+        MatchingService main =  new MatchingService();
         main.run();
     }
 }

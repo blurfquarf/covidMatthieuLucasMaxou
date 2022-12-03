@@ -1,34 +1,33 @@
+import MixingServer.MixingServerInterface;
 import Registrar.RegistrarInterface;
 
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.security.Signature;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Scanner;
+import java.security.*;
+import java.security.spec.RSAKeyGenParameterSpec;
+import java.time.LocalDateTime;
+import java.util.*;
 
 public class UserClient {
 
     public static void main(String[] args) throws RemoteException, NotBoundException {
 
-
         Registry myRegistry = LocateRegistry.getRegistry("localhost",
                 1099);
         RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
+
+        MixingServerInterface mixingServerImpl = (MixingServerInterface) myRegistry.lookup("MixingService");
 
         try{
             Thread req = new Thread(() -> {
                 try {
                     Scanner sc = new Scanner(System.in);
 
-
                     boolean userExists = true;
                     String phoneNr;
                     String temp = "";
-
                     while (userExists) {
                         System.out.println("enter a phoneNr:");
                         temp = sc.nextLine();
@@ -39,9 +38,11 @@ public class UserClient {
                         }
                     }
                     phoneNr = temp;
+                    KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+                    kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
+                    KeyPair pair = kpg.generateKeyPair();
 
-                    User u = new User(phoneNr);
-
+                    User u = new User(phoneNr, pair.getPrivate(), pair.getPublic());
 
                     //token-signatureBytes
                     Map<byte[], byte[]> newtokens  = registrarImpl.generateTokens(u.getPhoneNr());
@@ -59,8 +60,6 @@ public class UserClient {
                         System.out.println(valid);
                     }*/
 
-
-
                     u.addTokens(newtokens.keySet());
 
                     System.out.println("enter QR code:");
@@ -77,13 +76,17 @@ public class UserClient {
                         token = u.getToken();
                     }
 
+                    Signature signatureEngine = Signature.getInstance("SHA1withRSA");
+                    signatureEngine.initSign(u.getPrivk());
+                    signatureEngine.update(token);
 
 
+                    //TODO ADD CURRENT DAY (2min period)
+                    byte[] signature = signatureEngine.sign();
 
 
-
-
-
+                    Map<byte[], byte[]> signedHash = mixingServerImpl.addCapsule(LocalDateTime.now().toString(), u.getToken(), signature, q.getHash());
+                    //System.out.println(signedHash.toString());
 
 
 
@@ -98,6 +101,5 @@ public class UserClient {
 
 
     }
-
 
 }

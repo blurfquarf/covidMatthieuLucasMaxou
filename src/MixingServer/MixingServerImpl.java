@@ -1,7 +1,10 @@
 package MixingServer;
 import Registrar.RegistrarInterface;
 import java.nio.charset.StandardCharsets;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -17,7 +20,7 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
     PublicKey publicKey;
 
     ArrayList<byte[]> usedTokens;
-    HashMap<byte[], String > capsuleList;
+    HashMap<byte[], String> capsuleList;
     //equivalent van 3 dagen
     int timeToHoldCapsules= 3;
 
@@ -31,7 +34,12 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         privateKey = pair.getPrivate();
     }
 
-    public Map<byte[], byte[]> addCapsule(String time, byte[] token, byte[] signature, byte[] hash, RegistrarInterface registrarImpl) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException {
+    public Map<byte[], byte[]> addCapsule(String time, byte[] token, byte[] signature, byte[] hash) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException {
+        Registry myRegistry = LocateRegistry.getRegistry("localhost",
+                1099);
+        RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
+
+
         boolean isSignatureValid=isValidToken(token, signature, registrarImpl);
         boolean isDayValid = isValidDay(token);
         boolean isunused = isUnused(token);
