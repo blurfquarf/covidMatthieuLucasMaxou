@@ -1,8 +1,10 @@
 package Registrar;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.security.Signature;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.chrono.ChronoLocalDateTime;
 import java.util.ArrayList;
@@ -88,6 +90,7 @@ public class serverDB {
     public void setDays(String btw, int day){
         days.put(btw, day);
     }
+
 
 
 }

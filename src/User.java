@@ -10,6 +10,7 @@ public class User {
 
     private String phoneNr;
     private HashMap<String, QROutput> visitEntries = new HashMap<>();
+
     //hoe lang elke capsule bewaard moet worden
     private int duration = 7;
 
@@ -31,6 +32,9 @@ public class User {
         this.visitEntries.put(LocalDateTime.now().toString(), new QROutput(q));
     }
 
+    public void addToScanned(String QRCode){
+        scannedQRCodes.add(QRCode);
+    }
 
     public byte[] getToken() {
         LocalDate today = LocalDate.now();
@@ -52,5 +56,11 @@ public class User {
 
 
 
-
+    public void parseQRCodes() {
+        String QRCode = scannedQRCodes.get(scannedQRCodes.size()-1);
+        int Ri = Integer.parseInt(QRCode.substring(0,3));
+        randomNumbers.add(Ri);
+        int btwNumber = Integer.parseInt(QRCode.substring(4,9));
+        idOfCateringFacilities.add(btwNumber);
+    }
 }

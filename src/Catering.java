@@ -12,24 +12,34 @@ import java.util.*;
 public class Catering {
 
     private ArrayList<SecretKey> secretkeys;
+    //try to get the Ri to the user, so he/ the doctor can send it to the matching service
+    private static int randomNumberQR;
+
+
+
+    static String toBinary(byte[] bytes)
+    {
+        StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
+        for( int i = 0; i < Byte.SIZE * bytes.length; i++ )
+            sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0' : '1');
+        return sb.toString();
+    }
+
+
+
 
     public static String generateQRCode(int btw, byte[] pseudoniem) throws NoSuchAlgorithmException{
-
-
         //random nummer max 4 cijfers
         Random rand = new Random();
-        int randomNumber = rand.nextInt(9999-1000) + 1000;
+        randomNumberQR = rand.nextInt(9999-1000) + 1000;
 
         //int randomNumber=(int) (1000*Math.random());
-        int CF= btw;
-
-
 
         String pseudoniemstring= new String(pseudoniem, StandardCharsets.UTF_8);
 
         //hash maken van random number en pseudoniem
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        String s = randomNumber + pseudoniemstring;
+        String s = randomNumberQR + pseudoniemstring;
         byte[] QRHash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
 
 

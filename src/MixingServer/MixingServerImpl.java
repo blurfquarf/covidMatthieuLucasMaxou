@@ -6,10 +6,7 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 
 public class MixingServerImpl extends UnicastRemoteObject implements MixingServerInterface {
@@ -17,13 +14,13 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
     PublicKey publicKey;
 
     ArrayList<byte[]> usedTokens;
-    HashMap<byte[], String > capsuleList;
+    ArrayList<Capsule> capsuleList;
     //equivalent van 3 dagen
     int timeToHoldCapsules= 3;
 
     public MixingServerImpl() throws Exception{
         usedTokens= new ArrayList<>();
-        capsuleList=new HashMap<>();
+        capsuleList=new ArrayList<>();
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
         KeyPair pair = kpg.generateKeyPair();
@@ -35,9 +32,12 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         boolean isSignatureValid=isValidToken(token, signature, registrarImpl);
         boolean isDayValid = isValidDay(token);
         boolean isunused = isUnused(token);
-        Map<byte[], byte[]> signedHash = null;
+
+        //time when token was sent to server
+        Capsule capsule = new Capsule(token, signature, hash, time);
+        byte[] signedHash;
         if(isDayValid && isSignatureValid && isunused){
-            capsuleList.put(token, time);
+            capsuleList.add(capsule);
             usedTokens.add(token);
             signedHash = new HashMap<>(signHash(hash));
         }
@@ -96,6 +96,15 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         System.arraycopy(source, srcBegin, destination, 0, srcEnd - srcBegin);
         return destination;
     }
+
+    public void flushCapsules() throws RemoteException{
+        //shuffle the arraylist of capsules
+        Collections.shuffle(capsuleList);
+        // flush to the MatchingServer and empty the capsuleList
+
+
+    }
+
 
     public PublicKey getPK() {
         return this.publicKey;

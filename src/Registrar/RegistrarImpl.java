@@ -14,9 +14,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.time.LocalDate;
 import java.nio.ByteBuffer;
@@ -30,11 +32,13 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     serverDB registrarDB;
     PrivateKey mk;
     PublicKey pk;
+    LocalDateTime timeSinceLastGeneratedToken;
 
     public RegistrarImpl(serverDB db, PrivateKey mk, PublicKey pk) throws Exception {
         this.registrarDB = db;
         this.mk = mk;
         this.pk = pk;
+        timeSinceLastGeneratedToken = LocalDateTime.now().minusHours(1);
     }
 
 
@@ -123,6 +127,10 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     public Map<byte[], byte[]> generateTokens(String telefoonnr) throws NoSuchAlgorithmException,
             RemoteException, InvalidKeyException, SignatureException {
 
+        //check if enough time has passed since last time
+        LocalDateTime now =LocalDateTime.now();
+        double millis = Duration.between(timeSinceLastGeneratedToken, now).toMillis();
+        if(millis < 120000){return null;}
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         Map<byte[], byte[]> ts = new HashMap<>();
         for (int i = 0; i < 48; i++) {
@@ -151,6 +159,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             ts.put(token, signature);
             registrarDB.getTokenMappings().put(token, telefoonnr);
         }
+        timeSinceLastGeneratedToken=now;
         return ts;
     }
 
@@ -167,4 +176,5 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     public PublicKey getPK() throws RemoteException{
         return pk;
     }
+
 }
