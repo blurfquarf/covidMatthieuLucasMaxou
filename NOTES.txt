@@ -1,20 +1,6 @@
 ///////////TODO/////////
 LEAVEN WERKT NOG NIET
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+USER LOGT ZIJN EXIT/LEAVE TIMES
 
 ////////////VERSLAG////////////
 Received tokens omvatten token en bijhorend signature,

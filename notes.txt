@@ -1,3 +1,0 @@
-RMISecuritymanager is deprecated: in presentatie zetten!!!
-
-B, msk en timestamp key aanmaken in databank => server gaat uit, data nogsteeds bewaard.
