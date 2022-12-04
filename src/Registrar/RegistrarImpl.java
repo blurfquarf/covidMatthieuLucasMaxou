@@ -40,7 +40,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         timeSinceLastGeneratedToken = LocalDateTime.now().minusHours(1);
     }
 
-
     public PublicKey getServerPK(){
         return pk;
     }
@@ -48,8 +47,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     public boolean getUserByPhone(String PhoneNR) throws RemoteException {
         return registrarDB.getRegisteredPhonenumbers().contains(PhoneNR);
     }
-
-
 
     public ArrayList<byte[]> makeInitialSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
@@ -85,7 +82,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
 }
 
-        public ArrayList<byte[]> makeSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public ArrayList<byte[]> makeSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
         //check if request is not too soon
 
         System.out.println("entered normal Make Secrets");
@@ -108,7 +105,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         ArrayList<byte[]> emptyList = new ArrayList<>();
         return emptyList;
     }
-
 
     public byte[] generateCFPseudonym(String name, byte[] s, String location, int day) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
@@ -134,8 +130,8 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         //make 48 tokens for this phone number
         for (int i = 0; i < 48; i++) {
             double randomNumber = Math.random()*1000;
-            LocalDate today = LocalDate.now();
-            byte[] todayByteArray = today.toString().getBytes(StandardCharsets.UTF_8);
+            LocalDateTime todayTime = LocalDateTime.now();
+            byte[] todayByteArray = todayTime.toString().getBytes(StandardCharsets.UTF_8);
             //maak tokens en voeg deze toe aan de tokenMapping in de Registrar.serverDB
            /* byte[] date = todayTime.toString().getBytes(StandardCharsets.UTF_8);
 
@@ -165,7 +161,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         timeSinceLastGeneratedToken=now;
         return ts;
     }
-
 
     public static byte[] joinByteArray(byte[] byte1, byte[] byte2) {
 

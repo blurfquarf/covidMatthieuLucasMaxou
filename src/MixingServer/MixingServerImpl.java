@@ -48,13 +48,15 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         Capsule capsule = new Capsule(token, signature, hash, time);
         byte[] signedHash;
         if(isDayValid && isSignatureValid && isunused){
+            System.out.println("signing hash");
             capsuleList.add(capsule);
             usedTokens.add(token);
             signedHash = signHash(hash).values().iterator().next();
-        }
-        else {
+        } else {
+            System.out.println("hash not signed");
             signedHash = new byte[1];
         }
+        System.out.println("signed hash: "+ Arrays.toString(signedHash));
         return signedHash;
     }
 

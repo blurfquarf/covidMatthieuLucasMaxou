@@ -73,6 +73,7 @@ public class User {
 
 
     public void parseQRCodes() {
+        //te testen
         String QRCode = scannedQRCodes.get(scannedQRCodes.size()-1);
         int Ri = Integer.parseInt(QRCode.substring(0,3));
         randomNumbers.add(Ri);

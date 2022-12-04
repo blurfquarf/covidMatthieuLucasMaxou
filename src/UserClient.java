@@ -227,7 +227,6 @@ public class UserClient implements ActionListener {
         QROutput q = new QROutput(qr);
         u.addQROutput(q);
 
-
         System.out.println("In visit terechtgekomen!");
 
         try {
@@ -257,7 +256,8 @@ public class UserClient implements ActionListener {
                         System.out.println("token: "+ token);
 
                         signedHash = mixingServerImpl.addCapsule(LocalDateTime.now().toString(), token.getKey(), token.getValue(), q.getHash());
-                        System.out.println("new signed hash: "+ signedHash[0]);
+                        System.out.println("signed hash: "+ Arrays.toString(signedHash));
+                        //System.out.println("new signed hash: "+ signedHash[0]);
 
                         //get token verwijdert telkens opgevraagde token
                         if(Arrays.equals(signedHash, new byte[1])) token = u.getToken();
@@ -270,10 +270,14 @@ public class UserClient implements ActionListener {
                     //method to periodically send capsules to mixing server
                     while(visiting.get()){
                         System.out.println("visiting");
-                        //if a day = 120.000, this is once every hour
-                        Thread.sleep(5000);
+                        //if a day = 120.000, this is once every 2 hours
+                        Thread.sleep(10000);
                         String time = LocalDateTime.now().toString();
                         signedHash = mixingServerImpl.addCapsule(time, token.getKey(), token.getValue(), q.getHash());
+                        if(signedHash.equals(new byte[1])){
+                            System.out.println("new QR necessary, revisit with new QR-code!");
+                        }
+                        token = u.getToken();
                     }
                 }catch (Exception e) {
                     throw new RuntimeException(e);
