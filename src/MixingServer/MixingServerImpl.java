@@ -1,7 +1,10 @@
 package MixingServer;
 import Registrar.RegistrarInterface;
 import java.nio.charset.StandardCharsets;
+import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
+import java.rmi.registry.LocateRegistry;
+import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
 import java.security.spec.RSAKeyGenParameterSpec;
@@ -28,8 +31,8 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         privateKey = pair.getPrivate();
     }
 
-    public Map<byte[], byte[]> addCapsule(String time, byte[] token, byte[] signature, byte[] hash, RegistrarInterface registrarImpl) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException {
-        boolean isSignatureValid=isValidToken(token, signature, registrarImpl);
+    public byte[] addCapsule(String time, byte[] token, byte[] signature, byte[] hash) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException {
+        boolean isSignatureValid=isValidToken(token, signature);
         boolean isDayValid = isValidDay(token);
         boolean isunused = isUnused(token);
 
@@ -39,14 +42,16 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         if(isDayValid && isSignatureValid && isunused){
             capsuleList.add(capsule);
             usedTokens.add(token);
-            signedHash = new HashMap<>(signHash(hash));
+            signedHash = signHash(hash).values().iterator().next();
+        }
+        else {
+            signedHash = new byte[1];
         }
         return signedHash;
     }
 
     public Map<byte[], byte[]> signHash(byte[] hash) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Map<byte[], byte[]> ts = new HashMap<>();
-
         Signature signatureEngine = Signature.getInstance("SHA1withRSA");
         signatureEngine.initSign(privateKey);
         signatureEngine.update(hash);
@@ -58,8 +63,11 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
 
     }
 
-    public boolean isValidToken(byte[] token, byte[] signature, RegistrarInterface registrarImpl) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException {
+    public boolean isValidToken(byte[] token, byte[] signature) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException {
         Signature signatureEngine = Signature.getInstance("SHA1withRSA");
+
+        Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
+        RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
 
         signatureEngine.initVerify(registrarImpl.getPK());
         signatureEngine.update(token);
@@ -71,14 +79,12 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
     public boolean isValidDay(byte[] token) throws RemoteException {
         LocalDate today=LocalDate.now();
         byte[] dateToken = subbytes(token, 0,9);
-
-        if(Arrays.equals(dateToken, today.toString().getBytes(StandardCharsets.UTF_8))){
-            return true;
-        }
-        else return false;
+        boolean valid = Arrays.equals(dateToken, today.toString().getBytes(StandardCharsets.UTF_8));
+        System.out.println("Day is valid!");
+        return valid;
     }
 
-    public boolean isUnused(byte[] token){
+    public boolean isUnused(byte[] token) throws RemoteException {
         for (int i = 0; i < usedTokens.size(); i++) {
             byte[] temp = usedTokens.get(i);
             if(Arrays.equals(temp, token)) {

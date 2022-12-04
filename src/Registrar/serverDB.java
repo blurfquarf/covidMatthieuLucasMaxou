@@ -34,6 +34,7 @@ public class serverDB {
         pseudonyms = new HashMap<>();
         tokenMappings = new HashMap<>();
         days = new HashMap<>();
+        registeredPhonenumbers = new ArrayList<>();
     }
 
     public HashMap<String, LocalDateTime> getTimestamps() {

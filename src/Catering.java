@@ -96,7 +96,7 @@ public class Catering {
                         //when a key is used we remove it from the list, so it cannot be reused
                         byte[] pseudonym = registrarImpl.generateCFPseudonym(name, s, adress, day);
 
-                        System.out.println(pseudonym);
+                        System.out.println("pseudonym: "+ pseudonym);
 
                         //prints QR code every single day, visible to clients
                         QRCode = generateQRCode(btw, pseudonym);

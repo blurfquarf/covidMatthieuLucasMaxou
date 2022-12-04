@@ -12,7 +12,7 @@ public class MixingServer {
 
     private void run() { try {
 
-        Registry registry = LocateRegistry.createRegistry(1099);
+        Registry registry = LocateRegistry.createRegistry(1101);
         registry.rebind("MixingService", new MixingServerImpl());
         System.out.println("Mixing system  is ready");
 

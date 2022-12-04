@@ -1,31 +1,44 @@
+import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
+import java.util.*;
 
 public class User {
 
     private String phoneNr;
+    //Lists with scanned QR codes, and the random number and id's of the visited catering facilties.
+    //These will be used when a user is contaminated, to search in the matching service.
+    private ArrayList<String> scannedQRCodes;
+    private ArrayList<Integer> randomNumbers;
+    private ArrayList<Integer> idOfCateringFacilities;
+
+    private PrivateKey privk;
+    private PublicKey pubk;
     private HashMap<String, QROutput> visitEntries = new HashMap<>();
 
     //hoe lang elke capsule bewaard moet worden
     private int duration = 7;
 
-    private ArrayList<byte[]> tokens = new ArrayList<>();
+    private HashMap<byte[], byte[]> tokens = new HashMap<>();
 
-    User(String nr) {
+    User(String nr, PrivateKey a, PublicKey b) {
         this.phoneNr = nr;
+        this.privk = a;
+        this.pubk = b;
+        scannedQRCodes = new ArrayList<>();
+        randomNumbers = new ArrayList<>();
+        idOfCateringFacilities = new ArrayList<>();
     }
 
     public String getPhoneNr() {
         return this.phoneNr;
     }
 
-    public void addTokens(Set<byte[]> t) {
-        tokens.addAll(t);
+    public void addTokens(Map<byte[], byte[]> t) {
+        tokens.putAll(t);
     }
 
     public void addQROutput(QROutput q) {
@@ -36,24 +49,48 @@ public class User {
         scannedQRCodes.add(QRCode);
     }
 
-    public byte[] getToken() {
-        LocalDate today = LocalDate.now();
+    public Map.Entry<byte[], byte[]> getToken() {
+        Iterator<Map.Entry<byte[], byte[]>> it = tokens.entrySet().iterator();
+        Map.Entry<byte[], byte[]> entry = null;
+        if(it.hasNext()){
+            entry = tokens.entrySet().iterator().next();
+            tokens.remove(entry.getKey());
+        }
+
+        return entry;
+
+
+
+        /*LocalDate today = LocalDate.now();
         byte[] token = null;
+        byte[] signature = null;
         boolean found = false;
+        Iterator<Map.Entry<byte[], byte[]>> it = tokens.entrySet().iterator();
         while (!found) {
-            byte[] temp = Arrays.copyOfRange(tokens.get(0), 0, 9);
+            byte[] temp = Arrays.copyOfRange(it.next().getKey(), 0, 9);
             if(Arrays.equals(temp, today.toString().getBytes(StandardCharsets.UTF_8))) {
                 token = temp;
+                signature = tokens.get(token);
                 found = true;
             }
             else {
-                tokens.remove(0);
+                tokens.remove(token);
             }
         }
-        return token;
+        return ;*/
     }
 
+    public int getMapSize() {
+        return tokens.keySet().size();
+    }
 
+    public PrivateKey getPrivk() {
+        return privk;
+    }
+
+    public PublicKey getPubk() {
+        return pubk;
+    }
 
 
     public void parseQRCodes() {

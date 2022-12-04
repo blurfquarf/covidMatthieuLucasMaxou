@@ -18,6 +18,10 @@ public class QROutput {
         this.hash = q.hash;
     }
 
+    public String getHash() {
+        return this.hash;
+    }
+
 
 
 

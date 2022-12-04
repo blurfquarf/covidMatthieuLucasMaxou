@@ -1,3 +1,4 @@
+import MixingServer.MixingServerInterface;
 import Registrar.RegistrarInterface;
 
 import java.awt.*;
@@ -7,11 +8,12 @@ import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.security.Signature;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Scanner;
+import java.security.*;
+import java.security.spec.RSAKeyGenParameterSpec;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import javax.swing.*;
 
 public class UserClient implements ActionListener {
     private static User u;
@@ -191,6 +193,33 @@ public class UserClient implements ActionListener {
                 1099);
         RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");*/
 
+    }
+    public static User enrollUser(RegistrarInterface registrarImpl, String number) throws RemoteException, NotBoundException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, SignatureException, InvalidKeyException {
+       /* Scanner sc = new Scanner(System.in);
+
+        boolean userExists = true;
+        String phoneNr;
+        String temp = "";
+
+        while (userExists) {
+            System.out.println("enter a phoneNr:");
+            temp = sc.nextLine();
+            try{
+                userExists = registrarImpl.getUserByPhone(temp);
+            } catch (NullPointerException e) {
+                userExists = false;
+            }
+        }
+        phoneNr = temp;*/
+
+        KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
+        kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
+        KeyPair pair = kpg.generateKeyPair();
+
+        User u = new User(number, pair.getPrivate(), pair.getPublic());
+        newtokens = registrarImpl.generateTokens(u.getPhoneNr());
+        u.addTokens(newtokens);
+        return u;
     }
 
     public static void visit(User u, RegistrarInterface registrarImpl, MixingServerInterface mixingServerImpl, String qr) throws RemoteException, NotBoundException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, InterruptedException{

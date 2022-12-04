@@ -27,7 +27,6 @@ import java.nio.ByteBuffer;
 public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInterface {
 
     //String[] keyTime;
-
     //HashMap<Business, String[]> identifier = new HashMap<>();
     serverDB registrarDB;
     PrivateKey mk;
@@ -45,8 +44,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     public PublicKey getServerPK(){
         return pk;
     }
-
-
 
     public boolean getUserByPhone(String PhoneNR) throws RemoteException {
         return registrarDB.getRegisteredPhonenumbers().contains(PhoneNR);
