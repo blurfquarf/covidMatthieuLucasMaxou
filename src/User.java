@@ -56,28 +56,7 @@ public class User {
             entry = tokens.entrySet().iterator().next();
             tokens.remove(entry.getKey());
         }
-
         return entry;
-
-
-
-        /*LocalDate today = LocalDate.now();
-        byte[] token = null;
-        byte[] signature = null;
-        boolean found = false;
-        Iterator<Map.Entry<byte[], byte[]>> it = tokens.entrySet().iterator();
-        while (!found) {
-            byte[] temp = Arrays.copyOfRange(it.next().getKey(), 0, 9);
-            if(Arrays.equals(temp, today.toString().getBytes(StandardCharsets.UTF_8))) {
-                token = temp;
-                signature = tokens.get(token);
-                found = true;
-            }
-            else {
-                tokens.remove(token);
-            }
-        }
-        return ;*/
     }
 
     public int getMapSize() {

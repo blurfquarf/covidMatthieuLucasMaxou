@@ -43,6 +43,8 @@ public class Catering {
         byte[] QRHash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
 
 
+        System.out.println(Arrays.toString(QRHash));
+
         //geen probleem van string parseable te maken
         System.out.println("Random: " +randomNumberQR);
         System.out.println("btw: " + btw);
@@ -138,6 +140,9 @@ public class Catering {
                         //where is this catering in its cycle of 7 days
                         day = 1;
 
+
+
+                        //pseudonym changes with derivedKey
                         for (byte[] s : derivedKeys) {
                             //for every key in the list we use 1 every minute (read day)
                             //when a key is used we remove it from the list, so it cannot be reused

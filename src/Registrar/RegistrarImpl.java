@@ -130,15 +130,23 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         if(millis < 120000){return null;}
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         Map<byte[], byte[]> ts = new HashMap<>();
+
+        //make 48 tokens for this phone number
         for (int i = 0; i < 48; i++) {
             double randomNumber = Math.random()*1000;
             LocalDate today = LocalDate.now();
             byte[] todayByteArray = today.toString().getBytes(StandardCharsets.UTF_8);
             //maak tokens en voeg deze toe aan de tokenMapping in de Registrar.serverDB
-            byte[] date = today.toString().getBytes(StandardCharsets.UTF_8);
+           /* byte[] date = todayTime.toString().getBytes(StandardCharsets.UTF_8);
+
+
             date.toString();
+*/
+
             String sb = Double.toString(randomNumber);
             byte[] randomByteArray = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
+
+
             byte[] token = joinByteArray(todayByteArray, randomByteArray);
 
 
@@ -150,8 +158,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
             //TODO ADD CURRENT DAY (2min period)
             byte[] signature = signatureEngine.sign();
-
-
 
             ts.put(token, signature);
             registrarDB.getTokenMappings().put(token, telefoonnr);

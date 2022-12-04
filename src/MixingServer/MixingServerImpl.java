@@ -1,5 +1,8 @@
 package MixingServer;
 import Registrar.RegistrarInterface;
+
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -31,7 +34,7 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         privateKey = pair.getPrivate();
     }
 
-    public byte[] addCapsule(String time, byte[] token, byte[] signature, byte[] hash) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException {
+    public byte[] addCapsule(String time, byte[] token, byte[] signature, String hash) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException {
         boolean isSignatureValid=isValidToken(token, signature);
         boolean isDayValid = isValidDay(token);
         boolean isunused = isUnused(token);
@@ -50,15 +53,22 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         return signedHash;
     }
 
-    public Map<byte[], byte[]> signHash(byte[] hash) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public Map<byte[], byte[]> signHash(String hash) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Map<byte[], byte[]> ts = new HashMap<>();
+
+        byte[] bytes = new BigInteger(hash, 2).toByteArray();
+
+
+        System.out.println(Arrays.toString(bytes));
+
+
         Signature signatureEngine = Signature.getInstance("SHA1withRSA");
         signatureEngine.initSign(privateKey);
-        signatureEngine.update(hash);
+        signatureEngine.update(bytes);
 
         byte[] signature = signatureEngine.sign();
 
-        ts.put(hash, signature);
+        ts.put(bytes, signature);
         return ts;
 
     }
@@ -77,10 +87,27 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
     }
 
     public boolean isValidDay(byte[] token) throws RemoteException {
-        LocalDate today=LocalDate.now();
-        byte[] dateToken = subbytes(token, 0,9);
-        boolean valid = Arrays.equals(dateToken, today.toString().getBytes(StandardCharsets.UTF_8));
-        System.out.println("Day is valid!");
+        LocalDateTime today = LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS);
+        System.out.println("Huidige tijd: " + today);
+        byte[] dateToken = subbytes(token, 0,22);
+        String s = new String(dateToken);
+        String s1 = s.substring(0, s.length()-3);
+        System.out.println(s1);
+
+
+
+        DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDateTime d1 = LocalDateTime.parse(s.substring(0, s.length()-3), f);
+
+
+
+        LocalDateTime now = LocalDateTime.parse(today.format(f), f);
+        System.out.println("now: "+ now);
+        System.out.println("bytes: "+d1);
+
+        boolean valid = today.minusMinutes(2).isBefore(d1);
+        System.out.println("valid: "+valid);
+        if(valid) System.out.println("Day is valid!");
         return valid;
     }
 
@@ -94,6 +121,7 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         System.out.println("Unused!");
         return true;
     }
+
     //method used to get first 10 bytes
     public static byte[] subbytes(byte[] source, int srcBegin, int srcEnd) {
         byte destination[];

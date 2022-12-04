@@ -100,7 +100,7 @@ public class UserClient implements ActionListener {
                     number = numberTextField.getText();
 
 
-                    System.out.println(number);
+                    //System.out.println(number);
                     userExists = registrarImpl.getUserByPhone(number);
 
 
@@ -161,7 +161,7 @@ public class UserClient implements ActionListener {
                 try {
                     if(scanned.get()){
                         String qrCode = new String(qr);
-                        System.out.println(qrCode);
+                        //System.out.println(qrCode);
                         u.addToScanned(qrCode);
 
 
@@ -237,11 +237,14 @@ public class UserClient implements ActionListener {
 
                     //links = token, rechts = signature registrar
                     Map.Entry<byte[], byte[]> token;
+
                     //tokens can be empty
                     if (u.getMapSize() <= 0) {
                         newtokens = registrarImpl.generateTokens(u.getPhoneNr());
                         u.addTokens(newtokens);
                     }
+
+                    //token is an entry here!                     //links = token, rechts = signature registrar
                     token = u.getToken();
                     System.out.println("token: "+ token);
 
@@ -250,13 +253,19 @@ public class UserClient implements ActionListener {
                     //new byte[1] is default value returned when invalid!
                     while (Arrays.equals(signedHash, new byte[1])) {
                         //signedhash is signature reseived from mixingservice
+
+                        System.out.println("token: "+ token);
+
                         signedHash = mixingServerImpl.addCapsule(LocalDateTime.now().toString(), token.getKey(), token.getValue(), q.getHash());
                         System.out.println("new signed hash: "+ signedHash[0]);
 
                         //get token verwijdert telkens opgevraagde token
                         if(Arrays.equals(signedHash, new byte[1])) token = u.getToken();
                     }
-                    System.out.println("signature of hash: "+signedHash.toString());
+
+
+                    System.out.println("signature of hash: "+ signedHash.toString());
+                    token = u.getToken();
 
                     //method to periodically send capsules to mixing server
                     while(visiting.get()){
