@@ -9,8 +9,8 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 
 public interface MixingServerInterface extends Remote {
-    boolean isValidDay(byte[] token);
-    boolean isUnused(byte[] token);
-    boolean isValidToken(byte[] token, byte[] signature, RegistrarInterface registrarImpl ) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException;
-
+    boolean isValidDay(byte[] token) throws RemoteException;
+    boolean isUnused(byte[] token) throws RemoteException;
+    boolean isValidToken(byte[] token, byte[] signature ) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException;
+    byte[] addCapsule(String time, byte[] token, byte[] signature, byte[] hash) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException;
 }

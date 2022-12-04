@@ -20,7 +20,7 @@ public interface RegistrarInterface extends Remote {
 
     Map<byte[], byte[]> generateTokens(String telefoonnr) throws NoSuchAlgorithmException, RemoteException, InvalidKeyException, SignatureException;
 
-    boolean getUserByPhone(String phoneNR) throws RemoteException;
+    boolean getUserByPhone(String phoneNR) throws RemoteException, NoSuchAlgorithmException;
 
     PublicKey getPK() throws RemoteException;
 

@@ -44,11 +44,8 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
 
 
-    public boolean getUserByPhone(String PhoneNR){
-        if (registrarDB.getRegisteredPhonenumbers().contains(PhoneNR)) {
-            return true;
-        }
-        return false;
+    public boolean getUserByPhone(String PhoneNR) throws RemoteException {
+        return registrarDB.getRegisteredPhonenumbers().contains(PhoneNR);
     }
 
 

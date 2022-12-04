@@ -16,9 +16,9 @@ public class MixingServer {
         registry.rebind("MixingService", new MixingServerImpl());
         System.out.println("Mixing system  is ready");
 
-
+/*
         Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
-        RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
+        RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");*/
 
 
 

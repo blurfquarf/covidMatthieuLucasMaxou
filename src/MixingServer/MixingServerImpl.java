@@ -64,11 +64,11 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         signatureEngine.initVerify(registrarImpl.getPK());
         signatureEngine.update(token);
         boolean valid = signatureEngine.verify(signature);
-        System.out.println(valid);
+        System.out.println("tokenIsValid: " + valid);
         return valid;
     }
 
-    public boolean isValidDay(byte[] token){
+    public boolean isValidDay(byte[] token) throws RemoteException {
         LocalDate today=LocalDate.now();
         byte[] dateToken = subbytes(token, 0,9);
 
@@ -85,6 +85,7 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
                 return false;
             }
         }
+        System.out.println("Unused!");
         return true;
     }
     //method used to get first 10 bytes

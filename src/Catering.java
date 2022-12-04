@@ -34,8 +34,13 @@ public class Catering {
 
 
         //geen probleem van string parseable te maken
-        String finalQRCode=  randomNumber + CF + new String(QRHash, StandardCharsets.UTF_8);
-        System.out.println(finalQRCode);
+        System.out.println("Random: " +randomNumberQR);
+        System.out.println("btw: " + btw);
+        System.out.println("hash: " + toBinary(QRHash));
+        String finalQRCode= String.valueOf(randomNumberQR) + String.valueOf(btw) + toBinary(QRHash);
+        System.out.println();
+        System.out.println("QR-Code: " + finalQRCode);
+        System.out.println();
         return finalQRCode;
     }
 
@@ -60,8 +65,8 @@ public class Catering {
         System.out.println("registered, app running!");
 
         try{
-            Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
-            RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
+            Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
+            RegistrarInterface registrarImpl = (RegistrarInterface) registrarRegistry.lookup("RegistrarService");
 
 
             Thread req = new Thread(() -> {
@@ -128,7 +133,7 @@ public class Catering {
                             //when a key is used we remove it from the list, so it cannot be reused
                             byte[] pseudonym = registrarImpl.generateCFPseudonym(name, s, adress, day);
 
-                            System.out.println(pseudonym);
+                            System.out.println("pseudonym: " + pseudonym);
 
                             //prints QR code every single day, visible to clients
                             QRCode = generateQRCode(btw, pseudonym);
