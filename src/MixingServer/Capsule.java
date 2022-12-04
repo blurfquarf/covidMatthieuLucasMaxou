@@ -4,17 +4,17 @@ public class Capsule {
 
     private byte[] token;
     private byte[] signature;
-    private byte[] hash;
+    private String hash;
     private String time;
     
-    public Capsule(byte[] t, byte[] s, byte[] h, String time){
-        token=t;
-        signature=s;
-        hash=h;
-        time.equals(t);
+    public Capsule(byte[] t, byte[] s, String h, String time){
+        this.token = t;
+        this.signature = s;
+        this.hash = h;
+        this.time = time;
     }
 
-    public byte[] getHash() {
+    public String getHash() {
         return hash;
     }
 
