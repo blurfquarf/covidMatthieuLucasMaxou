@@ -1,5 +1,4 @@
 package MatchingService;
-
 import MixingServer.MixingServer;
 import MixingServer.MixingServerImpl;
 import Registrar.RegistrarInterface;
@@ -11,13 +10,13 @@ public class MatchingService {
 
     private void run() { try {
 
-        Registry registry = LocateRegistry.createRegistry(1099);
+        Registry registry = LocateRegistry.createRegistry(1100);
         registry.rebind("MatchingService", new MatchingServiceImpl());
         System.out.println("Matching Service is ready");
 
 
-        Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
-        RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
+        Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
+        RegistrarInterface registrarImpl = (RegistrarInterface) registrarRegistry.lookup("RegistrarService");
 
 
 

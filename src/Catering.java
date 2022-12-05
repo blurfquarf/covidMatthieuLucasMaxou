@@ -12,30 +12,47 @@ import java.util.*;
 public class Catering {
 
     private ArrayList<SecretKey> secretkeys;
+    //try to get the Ri to the user, so he/ the doctor can send it to the matching service
+    private static int randomNumberQR;
+
+
+
+    static String toBinary(byte[] bytes)
+    {
+        StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
+        for( int i = 0; i < Byte.SIZE * bytes.length; i++ )
+            sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0' : '1');
+        return sb.toString();
+    }
+
+
+
 
     public static String generateQRCode(int btw, byte[] pseudoniem) throws NoSuchAlgorithmException{
-
-
         //random nummer max 4 cijfers
         Random rand = new Random();
-        int randomNumber = rand.nextInt(9999-1000) + 1000;
+        randomNumberQR = rand.nextInt(9999-1000) + 1000;
 
         //int randomNumber=(int) (1000*Math.random());
-        int CF= btw;
-
-
 
         String pseudoniemstring= new String(pseudoniem, StandardCharsets.UTF_8);
 
         //hash maken van random number en pseudoniem
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        String s = randomNumber + pseudoniemstring;
+        String s = randomNumberQR + pseudoniemstring;
         byte[] QRHash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
 
 
+        System.out.println(Arrays.toString(QRHash));
+
         //geen probleem van string parseable te maken
-        String finalQRCode=  randomNumber + CF + new String(QRHash, StandardCharsets.UTF_8);
-        System.out.println(finalQRCode);
+        System.out.println("Random: " +randomNumberQR);
+        System.out.println("btw: " + btw);
+        System.out.println("hash: " + toBinary(QRHash));
+        String finalQRCode= String.valueOf(randomNumberQR) + String.valueOf(btw) + toBinary(QRHash);
+        System.out.println();
+        System.out.println("QR-Code: " + finalQRCode);
+        System.out.println();
         return finalQRCode;
     }
 
@@ -60,8 +77,8 @@ public class Catering {
         System.out.println("registered, app running!");
 
         try{
-            Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
-            RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
+            Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
+            RegistrarInterface registrarImpl = (RegistrarInterface) registrarRegistry.lookup("RegistrarService");
 
 
             Thread req = new Thread(() -> {
@@ -81,7 +98,7 @@ public class Catering {
                         //when a key is used we remove it from the list, so it cannot be reused
                         byte[] pseudonym = registrarImpl.generateCFPseudonym(name, s, adress, day);
 
-                        System.out.println(pseudonym);
+                        System.out.println("pseudonym: "+ pseudonym);
 
                         //prints QR code every single day, visible to clients
                         QRCode = generateQRCode(btw, pseudonym);
@@ -117,18 +134,22 @@ public class Catering {
                         if (derivedKeys.size() > oldKeys.size()) {
                             oldKeys = new ArrayList<>(derivedKeys);
                         }
+
                         else derivedKeys = new ArrayList<>(oldKeys);
 
 
                         //where is this catering in its cycle of 7 days
                         day = 1;
 
+
+
+                        //pseudonym changes with derivedKey
                         for (byte[] s : derivedKeys) {
                             //for every key in the list we use 1 every minute (read day)
                             //when a key is used we remove it from the list, so it cannot be reused
                             byte[] pseudonym = registrarImpl.generateCFPseudonym(name, s, adress, day);
 
-                            System.out.println(pseudonym);
+                            System.out.println("pseudonym: " + pseudonym);
 
                             //prints QR code every single day, visible to clients
                             QRCode = generateQRCode(btw, pseudonym);

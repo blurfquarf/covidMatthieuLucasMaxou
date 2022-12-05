@@ -1,0 +1,9 @@
+///////////TODO/////////
+LEAVEN WERKT NOG NIET
+USER LOGT ZIJN EXIT/LEAVE TIMES
+
+////////////VERSLAG////////////
+Received tokens omvatten token en bijhorend signature,
+om zo de datum uit de token te kunnen halen, de datum moet wel juist zijn als de token valid is!
+
+

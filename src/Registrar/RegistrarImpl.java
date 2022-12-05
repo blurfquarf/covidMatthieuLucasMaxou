@@ -14,9 +14,11 @@ import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.security.spec.KeySpec;
+import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.time.LocalDate;
 import java.nio.ByteBuffer;
@@ -25,33 +27,26 @@ import java.nio.ByteBuffer;
 public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInterface {
 
     //String[] keyTime;
-
     //HashMap<Business, String[]> identifier = new HashMap<>();
     serverDB registrarDB;
     PrivateKey mk;
     PublicKey pk;
+    LocalDateTime timeSinceLastGeneratedToken;
 
     public RegistrarImpl(serverDB db, PrivateKey mk, PublicKey pk) throws Exception {
         this.registrarDB = db;
         this.mk = mk;
         this.pk = pk;
+        timeSinceLastGeneratedToken = LocalDateTime.now().minusHours(1);
     }
-
 
     public PublicKey getServerPK(){
         return pk;
     }
 
-
-
-    public boolean getUserByPhone(String PhoneNR){
-        if (registrarDB.getRegisteredPhonenumbers().contains(PhoneNR)) {
-            return true;
-        }
-        return false;
+    public boolean getUserByPhone(String PhoneNR) throws RemoteException {
+        return registrarDB.getRegisteredPhonenumbers().contains(PhoneNR);
     }
-
-
 
     public ArrayList<byte[]> makeInitialSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
 
@@ -87,7 +82,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
 }
 
-        public ArrayList<byte[]> makeSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
+    public ArrayList<byte[]> makeSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
         //check if request is not too soon
 
         System.out.println("entered normal Make Secrets");
@@ -111,7 +106,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         return emptyList;
     }
 
-
     public byte[] generateCFPseudonym(String name, byte[] s, String location, int day) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         String sb = Arrays.toString(s) + location + day;
@@ -126,17 +120,29 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     public Map<byte[], byte[]> generateTokens(String telefoonnr) throws NoSuchAlgorithmException,
             RemoteException, InvalidKeyException, SignatureException {
 
+        //check if enough time has passed since last time
+        LocalDateTime now =LocalDateTime.now();
+        double millis = Duration.between(timeSinceLastGeneratedToken, now).toMillis();
+        if(millis < 120000){return null;}
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         Map<byte[], byte[]> ts = new HashMap<>();
+
+        //make 48 tokens for this phone number
         for (int i = 0; i < 48; i++) {
             double randomNumber = Math.random()*1000;
-            LocalDate today = LocalDate.now();
-            byte[] todayByteArray = today.toString().getBytes(StandardCharsets.UTF_8);
+            LocalDateTime todayTime = LocalDateTime.now();
+            byte[] todayByteArray = todayTime.toString().getBytes(StandardCharsets.UTF_8);
             //maak tokens en voeg deze toe aan de tokenMapping in de Registrar.serverDB
-            byte[] date = today.toString().getBytes(StandardCharsets.UTF_8);
+           /* byte[] date = todayTime.toString().getBytes(StandardCharsets.UTF_8);
+
+
             date.toString();
+*/
+
             String sb = Double.toString(randomNumber);
             byte[] randomByteArray = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
+
+
             byte[] token = joinByteArray(todayByteArray, randomByteArray);
 
 
@@ -149,14 +155,12 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             //TODO ADD CURRENT DAY (2min period)
             byte[] signature = signatureEngine.sign();
 
-
-
             ts.put(token, signature);
             registrarDB.getTokenMappings().put(token, telefoonnr);
         }
+        timeSinceLastGeneratedToken=now;
         return ts;
     }
-
 
     public static byte[] joinByteArray(byte[] byte1, byte[] byte2) {
 
@@ -170,4 +174,5 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     public PublicKey getPK() throws RemoteException{
         return pk;
     }
+
 }
