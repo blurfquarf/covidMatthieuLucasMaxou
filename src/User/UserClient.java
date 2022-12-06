@@ -7,6 +7,7 @@ import Registrar.RegistrarInterface;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -220,7 +221,6 @@ public class UserClient implements ActionListener {
                 }
             });
 
-
             scan.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
@@ -339,6 +339,14 @@ public class UserClient implements ActionListener {
         }catch (Exception e){
             e.printStackTrace();
         }
+    }
+
+    public static void writeLogs() throws IOException {
+        BufferedWriter w = new BufferedWriter(new FileWriter("UserLogFile"+phoneNr));
+        for (Map.Entry<LocalDateTime,Capsule> e : validUserCapsules.entrySet()) {
+
+        }
+
     }
 
     public static void addValidUserCapsules(Capsule capsule){
