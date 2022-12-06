@@ -1,5 +1,6 @@
 package MixingServer;
 
+import MatchingService.MatchingServiceImpl;
 import Registrar.RegistrarInterface;
 
 import javax.swing.*;
@@ -20,10 +21,15 @@ import java.util.Map;
 public class MixingServer {
 
     private void run() { try {
-
         Registry registry = LocateRegistry.createRegistry(1101);
         registry.rebind("MixingService", new MixingServerImpl());
         System.out.println("Mixing system  is ready");
+        Registry mixingRegistry = LocateRegistry.getRegistry("localhost", 1101);
+        Registry matchingRegistry = LocateRegistry.getRegistry("localhost", 1100);
+
+        MixingServerInterface mixingServerImpl = (MixingServerInterface) mixingRegistry.lookup("MixingService");
+        MatchingServiceImpl matchingServiceImpl = (MatchingServiceImpl) matchingRegistry.lookup("MatchingService");
+
 
         JLabel flushLabel = new JLabel("Press button to flush capsules to matching server!");
         JFrame frame = new JFrame();

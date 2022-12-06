@@ -129,8 +129,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
         //check if enough time has passed since last time
         LocalDateTime now =LocalDateTime.now();
-        double millis = Duration.between(timeSinceLastGeneratedToken, now).toMillis();
-        if(millis < 120000){return null;}
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         Map<byte[], byte[]> ts = new HashMap<>();
 

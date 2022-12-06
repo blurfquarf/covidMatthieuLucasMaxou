@@ -1,4 +1,5 @@
 package MixingServer;
+import MatchingService.MatchingServiceImpl;
 import Registrar.RegistrarInterface;
 
 import javax.swing.*;
@@ -155,7 +156,7 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         return destination;
     }
 
-    public void flushCapsules() throws RemoteException{
+    public void flushCapsules(MatchingServiceImpl matchingServiceImpl) throws RemoteException{
         //shuffle the arraylist of capsules
         Collections.shuffle(capsuleList);
 
@@ -165,7 +166,6 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         }
         capsuleList = new ArrayList<>();
     }
-
 
     public PublicKey getPK() {
         return this.publicKey;
