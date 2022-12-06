@@ -12,6 +12,10 @@ public class DoctorClient {
     // alle logs van een user signen en naar matching service sturen
 
 
+    public static
+
+
+
     public static void main(String[] args) throws InvalidAlgorithmParameterException, NotBoundException, SignatureException, RemoteException, InvalidKeyException {
         DoctorClient d = new DoctorClient();
         d.run();

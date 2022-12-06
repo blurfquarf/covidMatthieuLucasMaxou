@@ -59,6 +59,9 @@ public class UserClient implements ActionListener {
 
     static JButton visit = new JButton("Visit");
 
+    static JButton writeLogs = new JButton("Write out logs for doctor");
+
+    static JLabel writeLogsLabel = new JLabel("");
 
     public static void main(String[] args) throws InvalidAlgorithmParameterException, NotBoundException, SignatureException, RemoteException, InvalidKeyException {
         UserClient u = new UserClient();
@@ -94,17 +97,21 @@ public class UserClient implements ActionListener {
             JLabel enterQR = new JLabel("QR-code");
             JLabel numberField = new JLabel("Enter Phone number to enroll!");
 
-            enterQR.setPreferredSize(new Dimension(200, 50));
+            enterQR.setPreferredSize(new Dimension(90, 50));
             JTextField qrField = new JTextField();
             JTextField numberTextField = new JTextField();
 
-            numberField.setPreferredSize(new Dimension(200,50));
-            numberTextField.setPreferredSize(new Dimension(200,50));
-            qrField.setPreferredSize(new Dimension(200,50));
-            NewTokensLabel.setPreferredSize(new Dimension(200,50));
+            numberField.setPreferredSize(new Dimension(90,50));
+            numberTextField.setPreferredSize(new Dimension(90,50));
+            qrField.setPreferredSize(new Dimension(90,50));
+            NewTokensLabel.setPreferredSize(new Dimension(90,50));
             NewTokensLabel.setForeground(Color.green);
 
 
+            writeLogsLabel.setPreferredSize(new Dimension(90,50));
+
+
+            writeLogs.setEnabled(true);
             enroll.setEnabled(false);
             visit.setEnabled(false);
             //valid.setEnabled(false);
@@ -136,8 +143,24 @@ public class UserClient implements ActionListener {
             userPanel.add(send);
             userPanel.add(getTokens);
             userPanel.add(NewTokensLabel);
+            userPanel.add(writeLogs);
+            userPanel.add(writeLogsLabel);
 
             frame.setVisible(true);
+
+            writeLogs.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    try {
+                        writeLogs();
+                        writeLogsLabel.setText("Logs written to file for doctor! Get inside and stay clear from others!");
+                        writeLogsLabel.setBackground(Color.red);
+                    } catch (IOException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            });
+
 
             getTokens.addActionListener(new ActionListener() {
                 @Override
@@ -369,6 +392,7 @@ public class UserClient implements ActionListener {
     }
 
     public void parseQRCodes() {
+
         //te testen
         String QRCode = scannedQRCodes.get(scannedQRCodes.size()-1);
         int Ri = Integer.parseInt(QRCode.substring(0,3));
@@ -380,7 +404,4 @@ public class UserClient implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
     }
-
-
-
 }
