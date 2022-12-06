@@ -48,9 +48,14 @@ public class UserClient implements ActionListener {
         JFrame frame = new JFrame();
         JButton enroll = new JButton("Enroll");
         JButton visit = new JButton("Visit");
-        JButton leave = new JButton("Leave");
+
+
+        JButton valid = new JButton("Still valid?");
+
+        //scan QR
         JButton scan = new JButton("Scan");
 
+        //send enroll
         JButton send = new JButton("Send");
 
 
@@ -67,7 +72,7 @@ public class UserClient implements ActionListener {
 
         enroll.setEnabled(false);
         visit.setEnabled(false);
-        leave.setEnabled(false);
+        valid.setEnabled(false);
         scan.setEnabled(false);
         send.setEnabled(true);
 
@@ -95,8 +100,6 @@ public class UserClient implements ActionListener {
         userPanel.add(send);
 
         frame.setVisible(true);
-
-
 
         send.addActionListener(new ActionListener() {
             @Override
@@ -206,22 +209,6 @@ public class UserClient implements ActionListener {
 
     }
     public static User enrollUser(RegistrarInterface registrarImpl, String number) throws RemoteException, NotBoundException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, SignatureException, InvalidKeyException {
-       /* Scanner sc = new Scanner(System.in);
-
-        boolean userExists = true;
-        String phoneNr;
-        String temp = "";
-
-        while (userExists) {
-            System.out.println("enter a phoneNr:");
-            temp = sc.nextLine();
-            try{
-                userExists = registrarImpl.getUserByPhone(temp);
-            } catch (NullPointerException e) {
-                userExists = false;
-            }
-        }
-        phoneNr = temp;*/
 
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
@@ -267,7 +254,11 @@ public class UserClient implements ActionListener {
 
                         System.out.println("token: "+ token);
 
-                        signedHash = mixingServerImpl.addCapsule(LocalDateTime.now().toString(), token.getKey(), token.getValue(), q.getHash());
+                        LocalDateTime now = LocalDateTime.now();
+
+                        //gaat maar door als token valid is
+                        //send capsules to mixing server
+                        signedHash = mixingServerImpl.addCapsule(now.toString(), token.getKey(), token.getValue(), q.getHash());
                         System.out.println("signed hash: "+ Arrays.toString(signedHash));
                         //System.out.println("new signed hash: "+ signedHash[0]);
 

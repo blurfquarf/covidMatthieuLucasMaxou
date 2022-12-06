@@ -39,8 +39,15 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         privateKey = pair.getPrivate();
     }
 
+
+
+    //hash hier is QR code hash die per dag hetzelfde is (ander pseudonym elke dag)
     public byte[] addCapsule(String time, byte[] token, byte[] signature, String hash) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException {
+
+        //signature op token geldig? check met PK registrar
         boolean isSignatureValid=isValidToken(token, signature);
+
+        //token vandaag geldig?
         boolean isDayValid = isValidDay(token);
         boolean isunused = isUnused(token);
 
@@ -49,6 +56,8 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         byte[] signedHash;
         if(isDayValid && isSignatureValid && isunused){
             System.out.println("signing hash");
+
+            //add capsule to mixing server list of capsules
             capsuleList.add(capsule);
             usedTokens.add(token);
             signedHash = signHash(hash).values().iterator().next();

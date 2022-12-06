@@ -1,3 +1,5 @@
+import MixingServer.Capsule;
+
 import java.lang.reflect.Array;
 import java.nio.charset.StandardCharsets;
 import java.security.PrivateKey;
@@ -19,6 +21,9 @@ public class User {
     private PublicKey pubk;
     private HashMap<String, QROutput> visitEntries = new HashMap<>();
 
+
+    private HashMap<LocalDateTime, Capsule> validUserCapsules = new HashMap<>();
+
     //hoe lang elke capsule bewaard moet worden
     private int duration = 7;
 
@@ -31,6 +36,10 @@ public class User {
         scannedQRCodes = new ArrayList<>();
         randomNumbers = new ArrayList<>();
         idOfCateringFacilities = new ArrayList<>();
+    }
+
+    public void addValidUserCapsules(Capsule capsule){
+        validUserCapsules.put(capsule.getTime(), capsule);
     }
 
     public String getPhoneNr() {

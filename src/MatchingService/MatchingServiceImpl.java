@@ -38,7 +38,9 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
         capsuleList.add(c);
     }
 
-    public boolean checkIfMatchingCapsule(ArrayList<Capsule>infectedUserList){
+
+
+/*    public boolean checkIfMatchingCapsule(ArrayList<Capsule>infectedUserList){
         for(Capsule c : infectedUserList){
             for (Capsule match : capsuleList){
                 int ctime= Integer.parseInt(c.getTime());
@@ -53,5 +55,5 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
             }
         }
         return false;
-    }
+    }*/
 }

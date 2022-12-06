@@ -14,6 +14,13 @@ public class Capsule {
         this.time = time;
     }
 
+    public Capsule(byte[] t, byte[] s, String h, LocalDateTime time){
+        this.token = t;
+        this.signature = s;
+        this.hash = h;
+        this.time = time;
+    }
+
     public String getHash() {
         return hash;
     }

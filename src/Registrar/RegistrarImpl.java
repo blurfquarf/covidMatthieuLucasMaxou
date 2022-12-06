@@ -148,10 +148,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
             String sb = Double.toString(randomNumber);
             byte[] randomByteArray = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
-
-
             byte[] token = joinByteArray(todayByteArray, randomByteArray);
-
 
             //signing with the private masterkey
             Signature signatureEngine = Signature.getInstance("SHA1withRSA");
