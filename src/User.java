@@ -80,7 +80,6 @@ public class User {
         return pubk;
     }
 
-
     public void parseQRCodes() {
         //te testen
         String QRCode = scannedQRCodes.get(scannedQRCodes.size()-1);

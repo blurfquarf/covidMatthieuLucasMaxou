@@ -1,3 +1,4 @@
+import MixingServer.Capsule;
 import MixingServer.MixingServerInterface;
 import Registrar.RegistrarInterface;
 
@@ -29,8 +30,8 @@ public class UserClient implements ActionListener {
     private static QROutput q;
     private static String qr = "";
     private static String number;
-    private static LocalDateTime start;
-    private static LocalDateTime end;
+    private static LocalDateTime lastCapsuleSent;
+
 
 
 
@@ -40,7 +41,6 @@ public class UserClient implements ActionListener {
         Registry matchingRegistry = LocateRegistry.getRegistry("localhost", 1100);
 
         Registry mixingRegistry = LocateRegistry.getRegistry("localhost", 1101);
-
 
         RegistrarInterface registrarImpl = (RegistrarInterface) registrarRegistry.lookup("RegistrarService");
         MixingServerInterface mixingServerImpl = (MixingServerInterface) mixingRegistry.lookup("MixingService");
@@ -57,7 +57,6 @@ public class UserClient implements ActionListener {
 
         //send enroll
         JButton send = new JButton("Send");
-
 
         JLabel enterQR = new JLabel("QR-code");
         JLabel numberField = new JLabel("Enter Phone number to enroll!");
@@ -91,7 +90,7 @@ public class UserClient implements ActionListener {
 
         userPanel.add(enroll);
         userPanel.add(visit);
-        userPanel.add(leave);
+        userPanel.add(valid);
         userPanel.add(enterQR);
         userPanel.add(qrField);
         userPanel.add(scan);
@@ -101,6 +100,8 @@ public class UserClient implements ActionListener {
 
         frame.setVisible(true);
 
+
+
         send.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e)  {
@@ -108,10 +109,8 @@ public class UserClient implements ActionListener {
                 try {
                     number = numberTextField.getText();
 
-
                     //System.out.println(number);
                     userExists = registrarImpl.getUserByPhone(number);
-
 
                     if(!userExists) {
                         numberGiven.set(true);
@@ -122,7 +121,6 @@ public class UserClient implements ActionListener {
                 }
             }
         });
-
 
         enroll.addActionListener(new ActionListener() {
             @Override
@@ -147,7 +145,6 @@ public class UserClient implements ActionListener {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    start = LocalDateTime.now();
                     visit.setEnabled(true);
 
                     enterQR.setText("Enter QR-code below");
@@ -166,7 +163,7 @@ public class UserClient implements ActionListener {
                 send.setEnabled(false);
                 scan.setEnabled(false);
                 visit.setEnabled(false);
-                leave.setEnabled(false);
+                valid.setEnabled(false);
                 try {
                     if(scanned.get()){
                         String qrCode = new String(qr);
@@ -175,8 +172,8 @@ public class UserClient implements ActionListener {
 
 
                         u.parseQRCodes();
-                        leave.setEnabled(true);
                         visit(u, registrarImpl, mixingServerImpl, qr);
+                        valid.setEnabled(true);
                     }
                     scan.setEnabled(true);
 
@@ -188,25 +185,22 @@ public class UserClient implements ActionListener {
         });
 
 
-        leave.addActionListener(new ActionListener() {
+        valid.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                end = LocalDateTime.now();
                 try {
-                    leave(u, mixingServerImpl);
+                    if(lastCapsuleSent.isBefore(lastCapsuleSent.minusSeconds(5))) {
+                        valid.setEnabled(false);
+                    }
+                    else {
+                        reSendToken(u, mixingServerImpl);
+                    }
                 } catch (NotBoundException | NoSuchAlgorithmException | SignatureException | RemoteException | InvalidKeyException ex) {
                     ex.printStackTrace();
                 }
                 visit.setEnabled(true);
             }
         });
-
-
-/*
-        Registry myRegistry = LocateRegistry.getRegistry("localhost",
-                1099);
-        RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");*/
-
     }
     public static User enrollUser(RegistrarInterface registrarImpl, String number) throws RemoteException, NotBoundException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, SignatureException, InvalidKeyException {
 
@@ -223,7 +217,7 @@ public class UserClient implements ActionListener {
     public static void visit(User u, RegistrarInterface registrarImpl, MixingServerInterface mixingServerImpl, String qr)
             throws RemoteException, NotBoundException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, InterruptedException{
         System.out.println(qr);
-        QROutput q = new QROutput(qr);
+        q = new QROutput(qr);
         u.addQROutput(q);
 
         System.out.println("In visit terechtgekomen!");
@@ -260,26 +254,16 @@ public class UserClient implements ActionListener {
                         //send capsules to mixing server
                         signedHash = mixingServerImpl.addCapsule(now.toString(), token.getKey(), token.getValue(), q.getHash());
                         System.out.println("signed hash: "+ Arrays.toString(signedHash));
-                        //System.out.println("new signed hash: "+ signedHash[0]);
+
+                        //capsules this user has sent to the mixing server (for tracing later)
+                        u.addValidUserCapsules(new Capsule(token.getKey(), token.getValue(), q.getHash(), q.getRandom(), now));
 
                         //get token verwijdert telkens opgevraagde token
                         if(Arrays.equals(signedHash, new byte[1])) token = u.getToken();
                     }
                     System.out.println("signature of hash: "+ signedHash.toString());
-                    //token = u.getToken();
+                    lastCapsuleSent = LocalDateTime.now();
 
-                    //method to periodically send capsules to mixing server
-                    /*while(visiting.get()){
-                        System.out.println("visiting");
-                        //if a day = 120.000, this is once every 2 hours
-                        Thread.sleep(10000);
-                        String time = LocalDateTime.now().toString();
-                        signedHash = mixingServerImpl.addCapsule(time, token.getKey(), token.getValue(), q.getHash());
-                        if(signedHash.equals(new byte[1])){
-                            System.out.println("new QR necessary, revisit with new QR-code!");
-                        }
-                        token = u.getToken();
-                    }*/
                 }catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -290,24 +274,19 @@ public class UserClient implements ActionListener {
         }
     }
 
-    public static void leave(User u, MixingServerInterface mixingServerImpl) throws NotBoundException, NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException {
-        System.out.println("start: "+start.toString()+", end: "+end.toString());
-        while(start.isBefore(end)){
-            System.out.println("sending capsule");
-            String time = start.toString();
-            Map.Entry<byte[], byte[]> token = u.getToken();
-            byte[] signedHash;
-            signedHash = mixingServerImpl.addCapsule(time, token.getKey(), token.getValue(), q.getHash());
-            if(signedHash.equals(new byte[1])){
-                System.out.println("new QR necessary, revisit with new QR-code!");
-                start = end.plusMinutes(2);
-            }
-            else {
-                System.out.println("signature of hash: "+ signedHash.toString());
-                start = start.plusSeconds(5);
-            }
+    public static void reSendToken(User u, MixingServerInterface mixingServerImpl) throws NotBoundException, NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException {
+        System.out.println("sending capsule");
+        String time = LocalDateTime.now().toString();
+        Map.Entry<byte[], byte[]> token = u.getToken();
+        byte[] signedHash;
+        signedHash = mixingServerImpl.addCapsule(time, token.getKey(), token.getValue(), q.getHash());
+        lastCapsuleSent = LocalDateTime.now();
+        if(signedHash.equals(new byte[1])){
+            System.out.println("new QR necessary, revisit with new QR-code!");
         }
-        System.out.println("User left");
+        else {
+            System.out.println("signature of hash: "+ signedHash.toString());
+        }
     }
 
 

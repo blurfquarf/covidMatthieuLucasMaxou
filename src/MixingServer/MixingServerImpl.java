@@ -52,7 +52,13 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         boolean isunused = isUnused(token);
 
         //time when token was sent to server
-        Capsule capsule = new Capsule(token, signature, hash, time);
+        System.out.println(time);
+
+        DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDateTime d1 = LocalDateTime.parse(time.substring(0, time.length()-7), f);
+
+        Capsule capsule = new Capsule(token, signature, hash, d1);
+
         byte[] signedHash;
         if(isDayValid && isSignatureValid && isunused){
             System.out.println("signing hash");

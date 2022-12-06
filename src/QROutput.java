@@ -22,7 +22,8 @@ public class QROutput {
         return this.hash;
     }
 
-
-
+    public int getRandom() {
+        return this.random;
+    }
 
 }

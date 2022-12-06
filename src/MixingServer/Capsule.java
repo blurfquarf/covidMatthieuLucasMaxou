@@ -1,17 +1,21 @@
 package MixingServer;
 
+import java.time.LocalDateTime;
+
 public class Capsule {
 
     private byte[] token;
     private byte[] signature;
     private String hash;
-    private String time;
+    private LocalDateTime time;
+    private int Ri;
     
-    public Capsule(byte[] t, byte[] s, String h, String time){
+    public Capsule(byte[] t, byte[] s, String h, int Ri, LocalDateTime time){
         this.token = t;
         this.signature = s;
         this.hash = h;
         this.time = time;
+        this.Ri = Ri;
     }
 
     public Capsule(byte[] t, byte[] s, String h, LocalDateTime time){
@@ -25,7 +29,7 @@ public class Capsule {
         return hash;
     }
 
-    public String getTime() {
+    public LocalDateTime getTime() {
         return time;
     }
 
@@ -35,5 +39,9 @@ public class Capsule {
 
     public byte[] getToken() {
         return token;
+    }
+
+    public int getRandom() {
+        return this.Ri;
     }
 }
