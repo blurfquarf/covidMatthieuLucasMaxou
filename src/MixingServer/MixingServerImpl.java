@@ -1,6 +1,7 @@
 package MixingServer;
 import Registrar.RegistrarInterface;
 
+import javax.swing.*;
 import java.math.BigInteger;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
@@ -21,6 +22,7 @@ import java.util.*;
 
 
 public class MixingServerImpl extends UnicastRemoteObject implements MixingServerInterface {
+
     PrivateKey privateKey;
     PublicKey publicKey;
 
@@ -39,8 +41,6 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         privateKey = pair.getPrivate();
     }
 
-
-
     //hash hier is QR code hash die per dag hetzelfde is (ander pseudonym elke dag)
     public byte[] addCapsule(String time, byte[] token, byte[] signature, String hash) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException {
 
@@ -57,6 +57,8 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime d1 = LocalDateTime.parse(time.substring(0, time.length()-7), f);
 
+
+        //capsule without random, random is no longer necessary
         Capsule capsule = new Capsule(token, signature, hash, d1);
 
         byte[] signedHash;
@@ -156,9 +158,12 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
     public void flushCapsules() throws RemoteException{
         //shuffle the arraylist of capsules
         Collections.shuffle(capsuleList);
+
         // flush to the MatchingServer and empty the capsuleList
-
-
+        for (Capsule temp : capsuleList) {
+            matchingServiceImpl.send(temp.getTime(), temp.getHash(), temp.getToken(), temp.getSignature());
+        }
+        capsuleList = new ArrayList<>();
     }
 
 

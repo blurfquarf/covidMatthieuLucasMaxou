@@ -1,4 +1,4 @@
-import java.nio.charset.StandardCharsets;
+package User;
 
 public class QROutput {
 
@@ -26,4 +26,7 @@ public class QROutput {
         return this.random;
     }
 
+    public int getCF() {
+        return CF;
+    }
 }

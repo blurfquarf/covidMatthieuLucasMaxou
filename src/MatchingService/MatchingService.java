@@ -20,14 +20,6 @@ public class MatchingService {
 
 
 
-        int timer = 0;
-        while (true) {
-            if(timer%10==0) {
-
-            }
-            timer++;
-        }
-
 
 
     }catch (Exception e){

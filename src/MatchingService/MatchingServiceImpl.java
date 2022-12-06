@@ -13,6 +13,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -28,15 +29,21 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
     // TODO: na bepaald tijdsinterval vb 1 dag, overblijvende tokens ("uninformed") doorsturen naar registrar
 
 
-    ArrayList<Capsule> capsuleList;
+    ArrayList<Capsule> mixingServerCapsuleList;
 
     public MatchingServiceImpl() throws Exception{
-        capsuleList=new ArrayList<>();
+        mixingServerCapsuleList=new ArrayList<>();
+    }
 
+                                            //QR hash        //registrar token and signature
+    public void send(LocalDateTime time, String hash, byte[] token, byte[] signature) {
+        mixingServerCapsuleList.add(new Capsule(token, signature, hash, time));
     }
-    public void addToCapsuleList(Capsule c){
-        capsuleList.add(c);
-    }
+
+
+
+
+
 
 
 

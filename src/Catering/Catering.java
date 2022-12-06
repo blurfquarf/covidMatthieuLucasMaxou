@@ -1,3 +1,5 @@
+package Catering;
+
 import Registrar.RegistrarInterface;
 
 import javax.crypto.SecretKey;

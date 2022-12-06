@@ -25,6 +25,7 @@ public class serverDB {
 
     private ArrayList<String> registeredPhonenumbers;
 
+
     //tokenmapping by phone number
     private HashMap<byte[], String> tokenMappings;
 

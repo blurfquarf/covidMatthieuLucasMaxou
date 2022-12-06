@@ -18,6 +18,8 @@ public class Capsule {
         this.Ri = Ri;
     }
 
+
+    //time is when user sent this/visited
     public Capsule(byte[] t, byte[] s, String h, LocalDateTime time){
         this.token = t;
         this.signature = s;
