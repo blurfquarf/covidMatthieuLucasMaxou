@@ -259,7 +259,7 @@ public class UserClient implements ActionListener {
                             String qrCode = new String(qr);
                             //System.out.println(qrCode);
                             addToScanned(qrCode);
-                            parseQRCodes();
+                            //parseQRCodes();
                             visit(registrarImpl, mixingServerImpl, qr);
                             //valid.setEnabled(true);
                         }

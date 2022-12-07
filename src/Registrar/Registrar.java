@@ -22,7 +22,7 @@ public class Registrar {
         PublicKey serverPK = pair.getPublic();
 
         Registry registry = LocateRegistry.createRegistry(1099);
-            registry.rebind("RegistrarService", new RegistrarImpl( serverSK, serverPK));
+            registry.rebind("RegistrarService", new RegistrarImpl(serverSK, serverPK));
             System.out.println("system is ready");
         }
         catch (Exception e) {

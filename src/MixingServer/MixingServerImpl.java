@@ -161,7 +161,6 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         for (Capsule temp : capsuleList) {
             matchingServiceImpl.sendFromMixing(temp.getTime(), temp.getHash(), temp.getToken(), temp.getSignature());
         }
-
         capsuleList = new ArrayList<>();
     }
 

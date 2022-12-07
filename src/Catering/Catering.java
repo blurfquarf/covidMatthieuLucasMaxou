@@ -127,14 +127,8 @@ public class Catering {
                     //Thread.sleep(840000);
 
                     while(true) {
-                        //System.out.println(testBusiness.getBtw());
 
-                        //System.out.println(testBusiness);
                         derivedKeys = registrarImpl.makeSecretsForCF(name, btw, adress);
-
-                        /*for (byte[] b: derivedKeys) {
-                            System.out.println(Arrays.toString(b));
-                        }*/
 
                         //if request is sent to early, an empty list is returned
                         //check if te returned list is bigger than the current list
@@ -163,7 +157,6 @@ public class Catering {
 
                             //prints QR code every single day, visible to clients
                             QRCode = generateQRCode(btw, pseudonym);
-                            //registrarImpl.setDay(btw, day);
 
                             day++;
 

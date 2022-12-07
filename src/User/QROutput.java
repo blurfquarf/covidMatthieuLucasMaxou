@@ -1,5 +1,8 @@
 package User;
 
+import java.math.BigInteger;
+import java.util.Arrays;
+
 public class QROutput {
 
     private int random;
@@ -7,9 +10,14 @@ public class QROutput {
     private String hash;
 
     QROutput(String qrCode) {
-        this.random = Integer.parseInt(qrCode.substring(0,4));
-        this.CF = Integer.parseInt(qrCode.substring(4,10));
-        this.hash = qrCode.substring(11);
+        String[] temp = qrCode.split(",");
+        this.random = Integer.parseInt(temp[0]);
+        this.CF = Integer.parseInt(temp[1]);
+        this.hash = temp[2];
+        System.out.println("random: "+this.random);
+        System.out.println("CF: "+this.CF);
+        byte[] bytes = new BigInteger(hash, 2).toByteArray();
+        System.out.println("hash: "+ Arrays.toString(bytes));
     }
 
     QROutput(QROutput q) {
