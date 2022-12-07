@@ -437,4 +437,58 @@ public class UserClient implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
     }
+
+    static void makeVisualisation(byte[] signedHash) throws IOException{
+        //hier de visuele representatie van de signedHash maken
+        String positiveIntegerString = new BigInteger(1, signedHash).toString();
+        int[][] rgbArray = new int[positiveIntegerString.length()/3][3];
+        for (int i = 0; i < positiveIntegerString.length(); i+=3) {
+            // 3 aparte getallen voor 1 rgb-waarde
+            String red = positiveIntegerString.substring(i, i+1);
+            String green = positiveIntegerString.substring(i+1, i+2);
+            String blue = positiveIntegerString.substring(i+2, i+3);
+            rgbArray[i][0] = Integer.parseInt(red)*100/255;
+            rgbArray[i][1] = Integer.parseInt(green)*100/255;
+            rgbArray[i][2] = Integer.parseInt(blue)*100/255;
+            if(i==204){break;}
+        }
+
+
+        //rgbArray printen
+        for (int i = 0; i < rgbArray.length; i++) {
+            for (int j = 0; j < 3; j++) {
+                System.out.print(rgbArray[i][j]);
+            }
+            System.out.println();
+        }
+        int widthAndHeight = positiveIntegerString.length()/3;
+        //GFG tutorial
+        //BufferedImage image = new BufferedImage(widthAndHeight, widthAndHeight, BufferedImage.TYPE_INT_RGB);
+        //File img = new File("image.png");
+        //image = ImageIO.read(img);
+
+        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        //ImageIO.write(image, "jpg", baos );
+        ByteArrayInputStream bais = new ByteArrayInputStream(signedHash);
+        BufferedImage newImage = ImageIO.read(bais);
+        //ImageIO.write(newImage, "png", new File("/Users/vlmaxou/Documents/Unief/Distributed systems 1/Labo/Registration_Lucas_Matthieu_Maxou/src/User/image.png"));
+
+        // set rgbvalues in image
+ /*       for (int i = 0; i <widthAndHeight; i++) {
+            for (int j = 0; j < widthAndHeight; j++) {
+                /*int rgbValue = rgbArray[i][0];
+                //move the red value to the left so the green and blue values can get behind it
+                rgbValue = (rgbValue << 8) + rgbArray[i][1];
+                rgbValue = (rgbValue << 8) + rgbArray[i][2];
+
+                Color color = new Color(rgbArray[i][0],rgbArray[i][1],rgbArray[i][2]);
+                int rgb = color.getRGB();
+
+                image.setRGB(i, j, rgb );
+            }
+        }
+        */
+        Icon created = new ImageIcon(newImage);
+        icon.setIcon(created);
+    }
 }
