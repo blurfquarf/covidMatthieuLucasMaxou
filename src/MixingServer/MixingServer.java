@@ -1,6 +1,7 @@
 package MixingServer;
 
 import MatchingService.MatchingServiceImpl;
+import MatchingService.MatchingServiceInterface;
 import Registrar.RegistrarInterface;
 
 import javax.swing.*;
@@ -28,8 +29,6 @@ public class MixingServer {
         Registry matchingRegistry = LocateRegistry.getRegistry("localhost", 1100);
 
         MixingServerInterface mixingServerImpl = (MixingServerInterface) mixingRegistry.lookup("MixingService");
-        MatchingServiceImpl matchingServiceImpl = (MatchingServiceImpl) matchingRegistry.lookup("MatchingService");
-
 
         JLabel flushLabel = new JLabel("Press button to flush capsules to matching server!");
         JFrame frame = new JFrame();
@@ -48,22 +47,22 @@ public class MixingServer {
         mixingPanel.add(flush);
         mixingPanel.add(flushLabel);
 
+        frame.add(mixingPanel,BorderLayout.CENTER);
+
+
+
         frame.setVisible(true);
 
         flush.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    mixingServerImpl.flushCapsules(matchingServiceImpl);
-                } catch (RemoteException ex) {
+                    mixingServerImpl.flushCapsules();
+                } catch (RemoteException | NotBoundException ex) {
                     throw new RuntimeException(ex);
                 }
             }
         });
-
-
-
-
 
 
 

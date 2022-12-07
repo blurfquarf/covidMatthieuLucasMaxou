@@ -7,14 +7,12 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
-import java.security.KeyPair;
-import java.security.KeyPairGenerator;
-import java.security.PrivateKey;
-import java.security.PublicKey;
+import java.security.*;
 import java.security.spec.RSAKeyGenParameterSpec;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 
 public class MatchingServiceImpl extends UnicastRemoteObject implements MatchingServiceInterface {
@@ -30,6 +28,9 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
 
 
     ArrayList<Capsule> mixingServerCapsuleList;
+    ArrayList<Capsule> doctorCapsuleList;
+
+
 
     public MatchingServiceImpl() throws Exception{
         mixingServerCapsuleList=new ArrayList<>();
@@ -38,13 +39,57 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
                                             //QR hash        //registrar token and signature
     public void send(LocalDateTime time, String hash, byte[] token, byte[] signature) {
         mixingServerCapsuleList.add(new Capsule(token, signature, hash, time));
+
+        System.out.println("inbound hash from mixing server: " + Arrays.toString(mixingServerCapsuleList.get(0).getHash()));
+    }
+
+    public void sendFromDoctor(LocalDateTime time, byte[] hash, byte[] token, byte[] signature, int random, byte[] completePacket, byte[] completePacketSignature, String doctor) throws RemoteException, NotBoundException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        PublicKey doctorPK = getCorrectPK(doctor);
+        //only add to list if valid!
+        if (checkValidity(time, hash, token, signature, random, completePacket, completePacketSignature, doctorPK)) {
+            System.out.println("data from doctor valid!");
+            doctorCapsuleList.add(new Capsule(token, signature, hash, random, time));
+        }
+        System.out.println("inbound hash from doctor: " + Arrays.toString(doctorCapsuleList.get(0).getHash()));
     }
 
 
+    public PublicKey getCorrectPK(String doctor) throws RemoteException, NotBoundException {
+        Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
+        RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
+        return registrarImpl.getDoctorPK(doctor);
+    }
 
 
+    public boolean checkValidity(LocalDateTime time, byte[] hash, byte[] token, byte[] signature, int random, byte[] completePacket, byte[] completePacketSignature, PublicKey doctorPK) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        byte[] total = concatenate(time.toString().getBytes(), hash, token, signature, String.valueOf(random).getBytes());
+        if (!Arrays.equals(total, completePacket)){
+            return false;
+        }
 
+        //signature check on completePacket
 
+        Signature signatureEngine = Signature.getInstance("SHA1withRSA");
+        signatureEngine.initVerify(doctorPK);
+        signatureEngine.update(completePacket);
+        return signatureEngine.verify(completePacketSignature);
+    }
+
+    public byte[] concatenate(byte[] time, byte[] hash, byte[] token, byte[] signature, byte[] random) {
+        byte[] Ti = time;
+        byte[] H = hash;
+        byte[] To = token;
+        byte[] Si = signature;
+        byte[] Ra = random;
+
+        ByteBuffer concatenation = ByteBuffer.allocate(Ti.length + H.length + To.length + Si.length + Ra.length);
+        concatenation.put(Ti);
+        concatenation.put(H);
+        concatenation.put(To);
+        concatenation.put(Si);
+        concatenation.put(Ra);
+        return concatenation.array();
+    }
 
 
 /*    public boolean checkIfMatchingCapsule(ArrayList<Capsule>infectedUserList){

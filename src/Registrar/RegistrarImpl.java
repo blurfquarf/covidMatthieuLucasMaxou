@@ -40,11 +40,31 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     PublicKey pk;
     LocalDateTime timeSinceLastGeneratedToken;
 
+
+    //lijsten stellen kolommen in databank voor
+    //private HashMap<Business, byte[]> secretKeys;
+
+    private HashMap<String, LocalDateTime> timestamps;
+    private ArrayList<PseudonymHolder> pseudonyms;
+
+    private HashMap<String, Integer> days;
+
+    private ArrayList<String> registeredPhonenumbers;
+
+
+    //tokenmapping by phone number
+    private HashMap<byte[], String> tokenMappings;
+
+    private HashMap<String, PublicKey> doctorPubks;
+
+
+
     public RegistrarImpl(serverDB db, PrivateKey mk, PublicKey pk) throws Exception {
         this.registrarDB = db;
         this.mk = mk;
         this.pk = pk;
         timeSinceLastGeneratedToken = LocalDateTime.now().minusHours(1);
+        doctorPubks = new HashMap<String, PublicKey>();
     }
 
     public PublicKey getServerPK(){
@@ -173,7 +193,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
     }
 
-    public PublicKey getPK() throws RemoteException{
+    public PublicKey getPK() throws RemoteException {
         return pk;
     }
 

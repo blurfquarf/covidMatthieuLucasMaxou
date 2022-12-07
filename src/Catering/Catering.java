@@ -19,6 +19,8 @@ public class Catering {
 
 
 
+
+    //creating a bitstring
     static String toBinary(byte[] bytes)
     {
         StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
@@ -45,12 +47,14 @@ public class Catering {
         byte[] QRHash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
 
 
-        System.out.println(Arrays.toString(QRHash));
+        System.out.println("Hash for reference in mixing server: " + Arrays.toString(QRHash));
 
         //geen probleem van string parseable te maken
-        System.out.println("Random: " +randomNumberQR);
+        System.out.println("Random: " + randomNumberQR);
         System.out.println("btw: " + btw);
         System.out.println("hash: " + toBinary(QRHash));
+
+        //hash to bitlist to avoid enters in ascii
         String finalQRCode= String.valueOf(randomNumberQR) + String.valueOf(btw) + toBinary(QRHash);
         System.out.println();
         System.out.println("QR-Code: " + finalQRCode);

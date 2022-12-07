@@ -58,6 +58,8 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime d1 = LocalDateTime.parse(time.substring(0, time.length()-7), f);
 
+        byte[] h = new BigInteger(hash, 2).toByteArray();
+        System.out.println(Arrays.toString(h));
 
         //capsule without random, random is no longer necessary
         Capsule capsule = new Capsule(token, signature, hash, d1);
@@ -77,6 +79,7 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         System.out.println("signed hash: "+ Arrays.toString(signedHash));
         return signedHash;
     }
+
 
     public Map<byte[], byte[]> signHash(String hash) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Map<byte[], byte[]> ts = new HashMap<>();
@@ -119,12 +122,8 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         String s1 = s.substring(0, s.length()-3);
         System.out.println(s1);
 
-
-
         DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime d1 = LocalDateTime.parse(s.substring(0, s.length()-3), f);
-
-
 
         LocalDateTime now = LocalDateTime.parse(today.format(f), f);
         System.out.println("now: "+ now);
@@ -162,8 +161,9 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
 
         // flush to the MatchingServer and empty the capsuleList
         for (Capsule temp : capsuleList) {
-            matchingServiceImpl.send(temp.getTime(), temp.getHash(), temp.getToken(), temp.getSignature());
+            matchingServiceImpl.sendFromMixing(temp.getTime(), temp.getHash(), temp.getToken(), temp.getSignature());
         }
+
         capsuleList = new ArrayList<>();
     }
 

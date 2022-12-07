@@ -7,6 +7,7 @@ import Registrar.RegistrarInterface;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -17,7 +18,9 @@ import java.security.spec.RSAKeyGenParameterSpec;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
+import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.text.html.HTMLDocument;
 
 public class UserClient implements ActionListener {
     //TODO: functie om naar dokter te gaan als besmette patient : scchrijf alle logs (Token, Hash(Ri, pseudonym), Ri) + tijdstippen naar een file die de dokter dan kan uitlezen
@@ -36,6 +39,8 @@ public class UserClient implements ActionListener {
     private static PublicKey pubk;
     private static HashMap<String, QROutput> visitEntries = new HashMap<>();
 
+
+    //timestamp and corresponding capsules
     private static HashMap<LocalDateTime, Capsule> validUserCapsules = new HashMap<>();
 
     //hoe lang elke capsule bewaard moet worden
@@ -60,9 +65,11 @@ public class UserClient implements ActionListener {
 
     static JButton visit = new JButton("Visit");
 
-    static JButton writeLogs = new JButton("Write out logs for doctor");
+    static JButton writeLogs = new JButton("Write out logs for doctor/TAKE A DUMP");
 
     static JLabel writeLogsLabel = new JLabel("");
+
+    static JLabel icon = new JLabel("");
 
     public static void main(String[] args) throws InvalidAlgorithmParameterException, NotBoundException, SignatureException, RemoteException, InvalidKeyException {
         UserClient u = new UserClient();
@@ -73,7 +80,6 @@ public class UserClient implements ActionListener {
         try {
             Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
 
-            Registry matchingRegistry = LocateRegistry.getRegistry("localhost", 1100);
 
             Registry mixingRegistry = LocateRegistry.getRegistry("localhost", 1101);
 
@@ -108,9 +114,7 @@ public class UserClient implements ActionListener {
             NewTokensLabel.setPreferredSize(new Dimension(90,50));
             NewTokensLabel.setForeground(Color.green);
 
-
             writeLogsLabel.setPreferredSize(new Dimension(90,50));
-
 
             writeLogs.setEnabled(true);
             enroll.setEnabled(false);
@@ -122,7 +126,7 @@ public class UserClient implements ActionListener {
 
             JPanel userPanel = new JPanel(new GridLayout(10, 1, 100, 5));
             userPanel.setPreferredSize(new Dimension(100,100));
-            userPanel.setBackground(Color.red);
+            userPanel.setBackground(Color.lightGray);
 
             frame.setTitle("Test");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -133,19 +137,31 @@ public class UserClient implements ActionListener {
 
             frame.add(userPanel,BorderLayout.CENTER);
 
-            userPanel.add(enroll);
-            userPanel.add(visit);
+
+
+            /*1*/userPanel.add(numberField);
+            /*2*/userPanel.add(enterQR);
+
             //userPanel.add(valid);
-            userPanel.add(enterQR);
-            userPanel.add(qrField);
-            userPanel.add(scan);
-            userPanel.add(numberField);
-            userPanel.add(numberTextField);
-            userPanel.add(send);
-            userPanel.add(getTokens);
-            userPanel.add(NewTokensLabel);
-            userPanel.add(writeLogs);
-            userPanel.add(writeLogsLabel);
+
+            /*4*/userPanel.add(numberTextField);
+            /*3*/userPanel.add(qrField);
+            /*5*/userPanel.add(send);
+            /*6*/userPanel.add(scan);
+            /*8*/userPanel.add(enroll);
+            /*7*/userPanel.add(visit);
+
+            /*9*/userPanel.add(writeLogs);
+            /*10*/userPanel.add(getTokens);
+            /*11*/userPanel.add(NewTokensLabel);
+
+
+            /*12*/userPanel.add(writeLogsLabel);
+
+            userPanel.add(icon);
+
+
+
 
             frame.setVisible(true);
 
@@ -342,7 +358,7 @@ public class UserClient implements ActionListener {
     }
 
     public static void writeLogs() throws IOException {
-        BufferedWriter w = new BufferedWriter(new FileWriter("UserLogFile"+phoneNr));
+        BufferedWriter w = new BufferedWriter(new FileWriter("UserLogFile_"+ phoneNr));
         for (Map.Entry<LocalDateTime,Capsule> e : validUserCapsules.entrySet()) {
 
         }
@@ -408,6 +424,15 @@ public class UserClient implements ActionListener {
         int btwNumber = Integer.parseInt(QRCode.substring(4,9));
         idOfCateringFacilities.add(btwNumber);
     }
+
+    static String toBinary(byte[] bytes)
+    {
+        StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
+        for( int i = 0; i < Byte.SIZE * bytes.length; i++ )
+            sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0' : '1');
+        return sb.toString();
+    }
+
 
     @Override
     public void actionPerformed(ActionEvent e) {

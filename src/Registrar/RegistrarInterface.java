@@ -24,7 +24,12 @@ public interface RegistrarInterface extends Remote {
 
     PublicKey getPK() throws RemoteException;
 
-    //void setDay(int btw, int day) throws RemoteException;
+    void setPKForDoctor(String name, PublicKey pubk) throws RemoteException;
+
+    PublicKey getDoctorPK(String doctor) throws RemoteException;
+
+    public ArrayList<byte[]> getPseudonymsPerDay(LocalDateTime day) throws RemoteException;
+
 }
 
 

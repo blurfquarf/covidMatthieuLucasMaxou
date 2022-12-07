@@ -1,3 +1,4 @@
+/*
 package Registrar;
 
 import javax.crypto.SecretKey;
@@ -43,6 +44,7 @@ public class serverDB {
     }
 
     //enkel te gebruiken voor initialisatie
+*/
 /*    public void addIdentifiers(String bNaam, SecretKey k) {
         //byte[] encoded = k.getEncoded();
         byte[] encKey = new byte[k.getEncoded().length];
@@ -52,7 +54,8 @@ public class serverDB {
 
         //secretKeys.put(b, encKey);
         timestamps.put(bNaam, String.valueOf(LocalDateTime.now()));
-    }*/
+    }*//*
+
 
 
     public void deleteCF(String bNaam){
@@ -61,9 +64,11 @@ public class serverDB {
         if (pseudonyms.containsKey(bNaam)) pseudonyms.remove(bNaam);
     }
 
-   /* public byte[] getSecretKey(Business b) {
+   */
+/* public byte[] getSecretKey(Business b) {
         return secretKeys.get(b);
-    }*/
+    }*//*
+
 
     public ArrayList<String> getRegisteredPhonenumbers(){
         return registeredPhonenumbers;
@@ -96,3 +101,4 @@ public class serverDB {
 
 
 }
+*/

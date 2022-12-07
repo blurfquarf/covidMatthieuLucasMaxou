@@ -18,9 +18,7 @@ public class MatchingService {
         Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
         RegistrarInterface registrarImpl = (RegistrarInterface) registrarRegistry.lookup("RegistrarService");
 
-
-
-
+        //registrarImpl.getPseudonymsPerDay();
 
     }catch (Exception e){
         e.printStackTrace();
@@ -28,7 +26,6 @@ public class MatchingService {
     }
 
     public static void main(String[] args) {
-
         MatchingService main =  new MatchingService();
         main.run();
     }

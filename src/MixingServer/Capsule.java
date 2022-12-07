@@ -39,6 +39,8 @@ public class Capsule {
         return signature;
     }
 
+
+    //get token in capsule
     public byte[] getToken() {
         return token;
     }
