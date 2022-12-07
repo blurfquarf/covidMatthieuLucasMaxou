@@ -41,7 +41,7 @@ public class DoctorClient {
 
     JButton send = new JButton("Send");
 
-    String name = "Docter Bert";
+    String name = "Dokter Bert";
 
 
 
@@ -65,7 +65,7 @@ public class DoctorClient {
             privk = pair.getPrivate();
             pubk = pair.getPublic();
 
-            //REGISTRAR WILL BE MIDDLE MAN FOR PUBLIC KEY, DOCTOR SHOULDNT SEND PUBLIC KEY HIMSELF (UNSAFE)!
+            //REGISTRAR WILL BE MIDDLE MAN FOR PUBLIC KEY, DOCTOR SHOULDN'T SEND PUBLIC KEY HIMSELF (UNSAFE)!
             registrarImpl.setPKForDoctor(name, pubk);
 
 
@@ -179,7 +179,6 @@ public class DoctorClient {
 
 
     public byte[] concatenate(byte[] time, byte[] hash, byte[] token, byte[] signature, byte[] random) {
-
         ByteBuffer concatenation = ByteBuffer.allocate(time.length + hash.length + token.length + signature.length + random.length);
         concatenation.put(time);
         concatenation.put(hash);

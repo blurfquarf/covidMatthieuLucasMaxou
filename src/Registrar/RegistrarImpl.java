@@ -1,23 +1,13 @@
 package Registrar;//import java.rmi.RMISecurityManager;
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
-import javax.crypto.spec.PBEParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
 import java.nio.charset.StandardCharsets;
-import java.rmi.Remote;
 import java.rmi.RemoteException;
-import java.rmi.registry.LocateRegistry;
-import java.rmi.registry.Registry;
 import java.rmi.server.UnicastRemoteObject;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
-import java.security.spec.KeySpec;
-import java.time.Duration;
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.nio.ByteBuffer;
 
@@ -41,7 +31,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     //private HashMap<Business, byte[]> secretKeys;
 
     private HashMap<String, LocalDateTime> timestamps;
-    private ArrayList<PseudonymHolder> pseudonyms;
+    private ArrayList<ByteArrayHolder> pseudonyms;
 
     private HashMap<String, Integer> days;
 
@@ -137,7 +127,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         String sb = Arrays.toString(s) + location + day;
         byte[] pseudonym = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
-        pseudonyms.add(new PseudonymHolder(LocalDateTime.now(), pseudonym));
+        pseudonyms.add(new ByteArrayHolder(LocalDateTime.now(), pseudonym));
         days.put(btw, day);
 
 
@@ -212,9 +202,9 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
     public ArrayList<byte[]> getPseudonymsPerDay(LocalDateTime day) throws RemoteException {
         ArrayList<byte[]> toSend = new ArrayList<>();
-        for (PseudonymHolder p :pseudonyms) {
+        for (ByteArrayHolder p :pseudonyms) {
             if((p.getTime().isAfter(day.minusMinutes(2)) && p.getTime().isBefore(day)) || p.getTime().isEqual(day) || p.getTime().isEqual(day.minusMinutes(2))) {
-                toSend.add(p.getPseudonym());
+                toSend.add(p.getByteArray());
             }
         }
         return toSend;

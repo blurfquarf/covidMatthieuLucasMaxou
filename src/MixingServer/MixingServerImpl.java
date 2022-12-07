@@ -54,13 +54,10 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         boolean isunused = isUnused(token);
 
         //time when token was sent to server
-        System.out.println(time);
-
         DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
         LocalDateTime d1 = LocalDateTime.parse(time.substring(0, time.length()-7), f);
 
         byte[] h = new BigInteger(hash, 2).toByteArray();
-        System.out.println(Arrays.toString(h));
 
         //capsule without random, random is no longer necessary
         Capsule capsule = new Capsule(token, signature, h, d1);
@@ -86,10 +83,6 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         Map<byte[], byte[]> ts = new HashMap<>();
 
         byte[] bytes = new BigInteger(hash, 2).toByteArray();
-
-
-        System.out.println(Arrays.toString(bytes));
-
 
         Signature signatureEngine = Signature.getInstance("SHA1withRSA");
         signatureEngine.initSign(privateKey);

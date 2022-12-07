@@ -48,6 +48,7 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
 
     public void sendFromDoctor(LocalDateTime time, byte[] hash, byte[] token, byte[] signature, int random, byte[] completePacket, byte[] completePacketSignature, String doctor) throws RemoteException, NotBoundException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         PublicKey doctorPK = getCorrectPK(doctor);
+
         //only add to list if valid!
         if (checkValidity(time, hash, token, signature, random, completePacket, completePacketSignature, doctorPK)) {
             System.out.println("data from doctor valid!");
@@ -79,36 +80,20 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
     }
 
     public byte[] concatenate(byte[] time, byte[] hash, byte[] token, byte[] signature, byte[] random) {
-        byte[] Ti = time;
-        byte[] H = hash;
-        byte[] To = token;
-        byte[] Si = signature;
-        byte[] Ra = random;
-
-        ByteBuffer concatenation = ByteBuffer.allocate(Ti.length + H.length + To.length + Si.length + Ra.length);
-        concatenation.put(Ti);
-        concatenation.put(H);
-        concatenation.put(To);
-        concatenation.put(Si);
-        concatenation.put(Ra);
+        ByteBuffer concatenation = ByteBuffer.allocate(time.length + hash.length + token.length + signature.length + random.length);
+        concatenation.put(time);
+        concatenation.put(hash);
+        concatenation.put(token);
+        concatenation.put(signature);
+        concatenation.put(random);
         return concatenation.array();
     }
 
+    public ArrayList<Capsule> getMixingServerCapsuleList() throws RemoteException{
+        return mixingServerCapsuleList;
+    }
 
-/*    public boolean checkIfMatchingCapsule(ArrayList<Capsule>infectedUserList){
-        for(Capsule c : infectedUserList){
-            for (Capsule match : capsuleList){
-                int ctime= Integer.parseInt(c.getTime());
-                int matchtime = Integer.parseInt(match.getTime());    
-                boolean overlap = (ctime <= (matchtime+1)) && (matchtime <= ctime);
-                boolean overlap2 = (matchtime <= (ctime+1)) && (ctime <= matchtime);
-                if (c.getHash().equals(match.getHash()) && (overlap || overlap2)){
-                    //now we have a match, we need to check if it is in the same business
-                    //by checking Ri.
-
-                }
-            }
-        }
-        return false;
-    }*/
+    public ArrayList<Capsule> getDoctorCapsuleList() throws RemoteException{
+        return doctorCapsuleList;
+    }
 }

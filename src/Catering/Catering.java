@@ -3,6 +3,7 @@ package Catering;
 import Registrar.RegistrarInterface;
 
 import javax.crypto.SecretKey;
+import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
@@ -45,9 +46,10 @@ public class Catering {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         String s = randomNumberQR + pseudoniemstring;
         byte[] QRHash = digest.digest(s.getBytes(StandardCharsets.UTF_8));
-
-
         System.out.println("Hash for reference in mixing server: " + Arrays.toString(QRHash));
+        System.out.println(toBinary(QRHash));
+        byte[] bytes = new BigInteger(toBinary(QRHash), 2).toByteArray();
+        System.out.println(Arrays.toString(bytes));
 
         //geen probleem van string parseable te maken
         System.out.println("Random: " + randomNumberQR);
@@ -55,9 +57,11 @@ public class Catering {
         System.out.println("hash: " + toBinary(QRHash));
 
         //hash to bitlist to avoid enters in ascii
-        String finalQRCode= String.valueOf(randomNumberQR) + String.valueOf(btw) + toBinary(QRHash);
+        String finalQRCode = String.valueOf(randomNumberQR) + "," + String.valueOf(btw) + "," + toBinary(QRHash);
+
         System.out.println();
-        System.out.println("QR-Code: " + finalQRCode);
+        System.out.println("QR-code");
+        System.out.println(finalQRCode);
         System.out.println();
         return finalQRCode;
     }

@@ -48,9 +48,6 @@ public class UserClient implements ActionListener {
     private int duration = 7;
 
     private static HashMap<byte[], byte[]> tokens = new HashMap<>();
-    /*********/
-
-    //private static User u;
     private static Map<byte[], byte[]> newtokens;
     private static AtomicBoolean scanned = new AtomicBoolean(false);
     private static AtomicBoolean numberGiven = new AtomicBoolean(false);
@@ -125,6 +122,9 @@ public class UserClient implements ActionListener {
             send.setEnabled(true);
             getTokens.setEnabled(true);
 
+
+            icon.setOpaque(true);
+
             JPanel userPanel = new JPanel(new GridLayout(10, 1, 100, 5));
             userPanel.setPreferredSize(new Dimension(100,100));
             userPanel.setBackground(Color.lightGray);
@@ -151,14 +151,10 @@ public class UserClient implements ActionListener {
             /*6*/userPanel.add(scan);
             /*8*/userPanel.add(enroll);
             /*7*/userPanel.add(visit);
-
             /*9*/userPanel.add(writeLogs);
             /*10*/userPanel.add(getTokens);
             /*11*/userPanel.add(NewTokensLabel);
-
-
             /*12*/userPanel.add(writeLogsLabel);
-
             userPanel.add(icon);
 
 
@@ -325,28 +321,23 @@ public class UserClient implements ActionListener {
 
                     //new byte[1] is default value returned when invalid!
                     while (Arrays.equals(signedHash, new byte[1])) {
+
                         //signedhash is signature reseived from mixingservice
-
-                        System.out.println("token: "+ token);
-
                         LocalDateTime now = LocalDateTime.now();
 
                         //gaat maar door als token valid is
                         //send capsules to mixing server          //when sent       //token         //signature   //hash of QR code
                         signedHash = mixingServerImpl.addCapsule(now.toString(), token.getKey(), token.getValue(), q.getHash());
-                        System.out.println("signed hash: "+ Arrays.toString(signedHash));
-
                         //capsules this user has sent to the mixing server (for tracing later)
 
                         byte[] hash = new BigInteger(q.getHash(), 2).toByteArray();
-                        System.out.println("HIER LOOPT HET MIS!" + Arrays.toString(hash));
 
                         addValidUserCapsules(new Capsule(token.getKey(), token.getValue(), hash, q.getRandom(), now));
 
                         //get token verwijdert telkens opgevraagde token
                         if(Arrays.equals(signedHash, new byte[1])) token = getToken();
                     }
-                    System.out.println("signature of hash: "+ signedHash.toString());
+                    System.out.println("signature of hash: "+ Arrays.toString(signedHash));
                     lastCapsuleSent = LocalDateTime.now();
 
                     //visuele representatie maken
@@ -355,8 +346,8 @@ public class UserClient implements ActionListener {
                     //probleem wanneer je nog geen tokens hebt opgevraagd voor nieuwe dag
                 }catch (Exception e) {
                     visit.setEnabled(false);
-                    NewTokensLabel.setText("Vraag eerst nieuwe tokens op en druk dan terug op visit!");
-                    throw new RuntimeException(e);
+                    NewTokensLabel.setText("Tokens were not valid! Ask new tokens and/or press visit!");
+                    System.out.println("Tokens cleared, ready for revisit!");
                 }
             });
             visitThread.start();
@@ -428,16 +419,6 @@ public class UserClient implements ActionListener {
         return pubk;
     }
 
-    public void parseQRCodes() {
-
-        //te testen
-        String QRCode = scannedQRCodes.get(scannedQRCodes.size()-1);
-        int Ri = Integer.parseInt(QRCode.substring(0,3));
-        randomNumbers.add(Ri);
-        int btwNumber = Integer.parseInt(QRCode.substring(4,9));
-        idOfCateringFacilities.add(btwNumber);
-    }
-
     static String toBinary(byte[] bytes)
     {
         StringBuilder sb = new StringBuilder(bytes.length * Byte.SIZE);
@@ -451,57 +432,10 @@ public class UserClient implements ActionListener {
     public void actionPerformed(ActionEvent e) {
     }
 
+
     static void makeVisualisation(byte[] signedHash) throws IOException{
-        //hier de visuele representatie van de signedHash maken
-        String positiveIntegerString = new BigInteger(1, signedHash).toString();
-        int[][] rgbArray = new int[positiveIntegerString.length()/3][3];
-        for (int i = 0; i < positiveIntegerString.length(); i+=3) {
-            // 3 aparte getallen voor 1 rgb-waarde
-            String red = positiveIntegerString.substring(i, i+1);
-            String green = positiveIntegerString.substring(i+1, i+2);
-            String blue = positiveIntegerString.substring(i+2, i+3);
-            rgbArray[i][0] = Integer.parseInt(red)*100/255;
-            rgbArray[i][1] = Integer.parseInt(green)*100/255;
-            rgbArray[i][2] = Integer.parseInt(blue)*100/255;
-            if(i==204){break;}
-        }
-
-
-        //rgbArray printen
-        for (int i = 0; i < rgbArray.length; i++) {
-            for (int j = 0; j < 3; j++) {
-                System.out.print(rgbArray[i][j]);
-            }
-            System.out.println();
-        }
-        int widthAndHeight = positiveIntegerString.length()/3;
-        //GFG tutorial
-        //BufferedImage image = new BufferedImage(widthAndHeight, widthAndHeight, BufferedImage.TYPE_INT_RGB);
-        //File img = new File("image.png");
-        //image = ImageIO.read(img);
-
-        //ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        //ImageIO.write(image, "jpg", baos );
-        ByteArrayInputStream bais = new ByteArrayInputStream(signedHash);
-        BufferedImage newImage = ImageIO.read(bais);
-        //ImageIO.write(newImage, "png", new File("/Users/vlmaxou/Documents/Unief/Distributed systems 1/Labo/Registration_Lucas_Matthieu_Maxou/src/User/image.png"));
-
-        // set rgbvalues in image
- /*       for (int i = 0; i <widthAndHeight; i++) {
-            for (int j = 0; j < widthAndHeight; j++) {
-                /*int rgbValue = rgbArray[i][0];
-                //move the red value to the left so the green and blue values can get behind it
-                rgbValue = (rgbValue << 8) + rgbArray[i][1];
-                rgbValue = (rgbValue << 8) + rgbArray[i][2];
-
-                Color color = new Color(rgbArray[i][0],rgbArray[i][1],rgbArray[i][2]);
-                int rgb = color.getRGB();
-
-                image.setRGB(i, j, rgb );
-            }
-        }
-        */
-        Icon created = new ImageIcon(newImage);
-        icon.setIcon(created);
+        byte[] values = new byte[] {signedHash[5], signedHash[10], signedHash[15]};
+        Color color = new Color(values[0] & 0xFF, values[1] & 0xFF, values[2] & 0xFF);
+        icon.setBackground(color);
     }
 }
