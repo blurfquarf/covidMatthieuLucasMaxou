@@ -9,6 +9,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.*;
+import java.math.BigInteger;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -297,6 +298,7 @@ public class UserClient implements ActionListener {
             throws RemoteException, NotBoundException, NoSuchAlgorithmException, InvalidKeyException, SignatureException, InterruptedException{
         System.out.println(qr);
         q = new QROutput(qr);
+
         addQROutput(q);
 
         System.out.println("In visit terechtgekomen!");
@@ -335,7 +337,11 @@ public class UserClient implements ActionListener {
                         System.out.println("signed hash: "+ Arrays.toString(signedHash));
 
                         //capsules this user has sent to the mixing server (for tracing later)
-                        addValidUserCapsules(new Capsule(token.getKey(), token.getValue(), q.getHash(), q.getRandom(), now));
+
+                        byte[] hash = new BigInteger(q.getHash(), 2).toByteArray();
+                        System.out.println("HIER LOOPT HET MIS!" + Arrays.toString(hash));
+
+                        addValidUserCapsules(new Capsule(token.getKey(), token.getValue(), hash, q.getRandom(), now));
 
                         //get token verwijdert telkens opgevraagde token
                         if(Arrays.equals(signedHash, new byte[1])) token = getToken();
@@ -343,6 +349,8 @@ public class UserClient implements ActionListener {
                     System.out.println("signature of hash: "+ signedHash.toString());
                     lastCapsuleSent = LocalDateTime.now();
 
+                    //visuele representatie maken
+                    makeVisualisation(signedHash);
 
                     //probleem wanneer je nog geen tokens hebt opgevraagd voor nieuwe dag
                 }catch (Exception e) {
@@ -360,9 +368,14 @@ public class UserClient implements ActionListener {
     public static void writeLogs() throws IOException {
         BufferedWriter w = new BufferedWriter(new FileWriter("UserLogFile_"+ phoneNr));
         for (Map.Entry<LocalDateTime,Capsule> e : validUserCapsules.entrySet()) {
-
+            //enkel de logs van de laatste 5 dagen doorsturen naar de dokter
+            if(e.getKey().isAfter(LocalDateTime.now().minusMinutes(10)) && e.getKey().isBefore(LocalDateTime.now()) ) {
+                //time,token,signature,hash,random
+                w.write(e.getKey().toString()+","+ toBinary(e.getValue().getToken()) +","+toBinary(e.getValue().getSignature())+","+toBinary(e.getValue().getHash())+","+e.getValue().getRandom());
+                w.newLine();
+            }
         }
-
+        w.close();
     }
 
     public static void addValidUserCapsules(Capsule capsule){

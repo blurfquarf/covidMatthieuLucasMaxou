@@ -17,12 +17,12 @@ public class Registrar {
         kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
         KeyPair pair = kpg.generateKeyPair();
 
-        serverDB registrarDB = new serverDB();
+        //serverDB registrarDB = new serverDB();
         PrivateKey serverSK = pair.getPrivate();
         PublicKey serverPK = pair.getPublic();
 
         Registry registry = LocateRegistry.createRegistry(1099);
-            registry.rebind("RegistrarService", new RegistrarImpl(registrarDB, serverSK, serverPK));
+            registry.rebind("RegistrarService", new RegistrarImpl( serverSK, serverPK));
             System.out.println("system is ready");
         }
         catch (Exception e) {

@@ -1,5 +1,6 @@
 package MixingServer;
 import MatchingService.MatchingServiceImpl;
+import MatchingService.MatchingServiceInterface;
 import Registrar.RegistrarInterface;
 
 import javax.swing.*;
@@ -62,7 +63,7 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         System.out.println(Arrays.toString(h));
 
         //capsule without random, random is no longer necessary
-        Capsule capsule = new Capsule(token, signature, hash, d1);
+        Capsule capsule = new Capsule(token, signature, h, d1);
 
         byte[] signedHash;
         if(isDayValid && isSignatureValid && isunused){
@@ -155,7 +156,11 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         return destination;
     }
 
-    public void flushCapsules(MatchingServiceImpl matchingServiceImpl) throws RemoteException{
+    public void flushCapsules() throws RemoteException, NotBoundException {
+
+        Registry matchingRegistry = LocateRegistry.getRegistry("localhost", 1100);
+        MatchingServiceInterface matchingServiceImpl = (MatchingServiceInterface) matchingRegistry.lookup("MatchingService");
+
         //shuffle the arraylist of capsules
         Collections.shuffle(capsuleList);
 

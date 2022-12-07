@@ -2,6 +2,8 @@ package MatchingService;
 import MixingServer.Capsule;
 import Registrar.RegistrarInterface;
 
+import java.math.BigInteger;
+import java.nio.ByteBuffer;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
@@ -33,11 +35,12 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
 
 
     public MatchingServiceImpl() throws Exception{
-        mixingServerCapsuleList=new ArrayList<>();
+        mixingServerCapsuleList = new ArrayList<>();
+        doctorCapsuleList = new ArrayList<>();
     }
 
-                                            //QR hash        //registrar token and signature
-    public void send(LocalDateTime time, String hash, byte[] token, byte[] signature) {
+                                                 //QR hash        //registrar token and signature
+    public void sendFromMixing(LocalDateTime time, byte[] hash, byte[] token, byte[] signature)throws RemoteException{
         mixingServerCapsuleList.add(new Capsule(token, signature, hash, time));
 
         System.out.println("inbound hash from mixing server: " + Arrays.toString(mixingServerCapsuleList.get(0).getHash()));

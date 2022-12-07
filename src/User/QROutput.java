@@ -7,9 +7,9 @@ public class QROutput {
     private String hash;
 
     QROutput(String qrCode) {
-        this.random = Integer.parseInt(qrCode.substring(0,3));
-        this.CF = Integer.parseInt(qrCode.substring(4,9));
-        this.hash = qrCode.substring(10);
+        this.random = Integer.parseInt(qrCode.substring(0,4));
+        this.CF = Integer.parseInt(qrCode.substring(4,10));
+        this.hash = qrCode.substring(11);
     }
 
     QROutput(QROutput q) {

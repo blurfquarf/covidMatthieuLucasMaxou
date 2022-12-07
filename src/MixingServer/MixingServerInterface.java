@@ -1,6 +1,7 @@
 package MixingServer;
 
 import MatchingService.MatchingServiceImpl;
+import MatchingService.MatchingServiceInterface;
 import Registrar.RegistrarInterface;
 
 import java.rmi.NotBoundException;
@@ -18,7 +19,5 @@ public interface MixingServerInterface extends Remote {
     boolean isValidToken(byte[] token, byte[] signature ) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException;
     byte[] addCapsule(String time, byte[] token, byte[] signature, String hash) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException;
 
-    void flushCapsules(MatchingServiceImpl matchingServiceImpl) throws RemoteException;
-
-
+    void flushCapsules() throws RemoteException, NotBoundException;
     }

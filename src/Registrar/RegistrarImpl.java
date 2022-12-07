@@ -18,11 +18,8 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.time.LocalDate;
 import java.nio.ByteBuffer;
-
 
 public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInterface {
 
@@ -35,7 +32,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
     //String[] keyTime;
     //HashMap<Business, String[]> identifier = new HashMap<>();
-    serverDB registrarDB;
     PrivateKey mk;
     PublicKey pk;
     LocalDateTime timeSinceLastGeneratedToken;
@@ -59,8 +55,12 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
 
 
-    public RegistrarImpl(serverDB db, PrivateKey mk, PublicKey pk) throws Exception {
-        this.registrarDB = db;
+    public RegistrarImpl(PrivateKey mk, PublicKey pk) throws Exception {
+        timestamps = new HashMap<>();
+        pseudonyms = new ArrayList<>();
+        tokenMappings = new HashMap<>();
+        days = new HashMap<>();
+        registeredPhonenumbers = new ArrayList<>();
         this.mk = mk;
         this.pk = pk;
         timeSinceLastGeneratedToken = LocalDateTime.now().minusHours(1);
@@ -72,7 +72,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     }
 
     public boolean getUserByPhone(String PhoneNR) throws RemoteException {
-        return registrarDB.getRegisteredPhonenumbers().contains(PhoneNR);
+        return registeredPhonenumbers.contains(PhoneNR);
     }
 
     public ArrayList<byte[]> makeInitialSecretsForCF(String name, int btw, String adress) throws NoSuchAlgorithmException, InvalidKeySpecException {
@@ -85,7 +85,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             derivedKeys.add(generateSecretKey(btw, i).getEncoded());
         }
 
-        registrarDB.setLocalDateTime(name, LocalDateTime.now());
+        timestamps.put(name, LocalDateTime.now());
         return derivedKeys;
     }
 
@@ -113,8 +113,8 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         //check if request is not too soon
 
         System.out.println("entered normal Make Secrets");
-        LocalDateTime dateTime = registrarDB.getTimestamp(name);
 
+        LocalDateTime dateTime = timestamps.get(name);
 
         //should be 14
         if (dateTime.isBefore(LocalDateTime.now().minusMinutes((long) 13.9))){
@@ -126,20 +126,20 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             for (int i = 0; i < 7; i++) {
                 derivedKeys.add(generateSecretKey(btw, i).getEncoded());
             }
-            registrarDB.setLocalDateTime(name, LocalDateTime.now());
+            timestamps.put(name, LocalDateTime.now());
             return derivedKeys;
     }
         ArrayList<byte[]> emptyList = new ArrayList<>();
         return emptyList;
     }
 
-    public byte[] generateCFPseudonym(String name, byte[] s, String location, int day) throws NoSuchAlgorithmException {
+    public byte[] generateCFPseudonym(String btw, byte[] s, String location, int day) throws NoSuchAlgorithmException {
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
         String sb = Arrays.toString(s) + location + day;
         byte[] pseudonym = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
-        registrarDB.setPseudonym(name, pseudonym);
+        pseudonyms.add(new PseudonymHolder(LocalDateTime.now(), pseudonym));
+        days.put(btw, day);
 
-        registrarDB.setDays(name, day);
 
         return pseudonym;
     }
@@ -178,7 +178,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             byte[] signature = signatureEngine.sign();
 
             ts.put(token, signature);
-            registrarDB.getTokenMappings().put(token, telefoonnr);
+            tokenMappings.put(token, telefoonnr);
         }
         timeSinceLastGeneratedToken=now;
         return ts;
@@ -197,4 +197,26 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         return pk;
     }
 
+    public void setPKForDoctor(String name, PublicKey pubk) throws RemoteException{
+        doctorPubks.put(name, pubk);
+    }
+
+    public PublicKey getDoctorPK(String doctor) throws RemoteException{
+        for (Map.Entry<String, PublicKey> entry : doctorPubks.entrySet()) {
+            if(entry.getKey().equals(doctor)){
+                return entry.getValue();
+            }
+        }
+        return null;
+    }
+
+    public ArrayList<byte[]> getPseudonymsPerDay(LocalDateTime day) throws RemoteException {
+        ArrayList<byte[]> toSend = new ArrayList<>();
+        for (PseudonymHolder p :pseudonyms) {
+            if((p.getTime().isAfter(day.minusMinutes(2)) && p.getTime().isBefore(day)) || p.getTime().isEqual(day) || p.getTime().isEqual(day.minusMinutes(2))) {
+                toSend.add(p.getPseudonym());
+            }
+        }
+        return toSend;
+    }
 }

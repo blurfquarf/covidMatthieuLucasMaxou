@@ -6,11 +6,11 @@ public class Capsule {
 
     private byte[] token;
     private byte[] signature;
-    private String hash;
+    private byte[] hash;
     private LocalDateTime time;
     private int Ri;
     
-    public Capsule(byte[] t, byte[] s, String h, int Ri, LocalDateTime time){
+    public Capsule(byte[] t, byte[] s, byte[] h, int Ri, LocalDateTime time){
         this.token = t;
         this.signature = s;
         this.hash = h;
@@ -18,16 +18,15 @@ public class Capsule {
         this.Ri = Ri;
     }
 
-
     //time is when user sent this/visited
-    public Capsule(byte[] t, byte[] s, String h, LocalDateTime time){
+    public Capsule(byte[] t, byte[] s, byte[] h, LocalDateTime time){
         this.token = t;
         this.signature = s;
         this.hash = h;
         this.time = time;
     }
 
-    public String getHash() {
+    public byte[] getHash() {
         return hash;
     }
 
