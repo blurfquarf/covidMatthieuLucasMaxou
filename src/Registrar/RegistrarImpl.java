@@ -203,6 +203,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         for (ByteArrayHolder p: pseudonyms) {
             if((p.getTime().isAfter(day.minusMinutes(2)) && p.getTime().isBefore(day)) || p.getTime().isEqual(day) || p.getTime().isEqual(day.minusMinutes(2))) {
                 toSend.add(p.getByteArray());
+                System.out.println("pseudonym added: "+Arrays.toString(p.getByteArray()));
             }
         }
         return toSend;

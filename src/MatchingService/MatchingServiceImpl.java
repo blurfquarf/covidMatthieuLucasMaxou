@@ -55,7 +55,6 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
         }
     }
 
-
     public PublicKey getCorrectPK(String doctor) throws RemoteException, NotBoundException {
         Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
         RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
@@ -89,6 +88,93 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
 
 
 
+    public ArrayList<byte[]> getMixingServerCapsuleListToken() throws RemoteException {
+        ArrayList<byte[]> tokens = new ArrayList<>();
+        for (Capsule c:mixingServerCapsuleList) {
+            tokens.add(c.getToken());
+        }
+        return tokens;
+    }
 
+    public ArrayList<byte[]> getMixingServerCapsuleListSignature() throws RemoteException{
+        ArrayList<byte[]> signatures = new ArrayList<>();
+        for (Capsule c:mixingServerCapsuleList) {
+            signatures.add(c.getSignature());
+        }
+        return signatures;
+    }
+
+
+    public ArrayList<byte[]> getMixingServerCapsuleListHash() throws RemoteException{
+        ArrayList<byte[]> hashes = new ArrayList<>();
+        for (Capsule c:mixingServerCapsuleList) {
+            hashes.add(c.getHash());
+        }
+        return hashes;
+    }
+
+
+    public ArrayList<LocalDateTime> getMixingServerCapsuleListTime() throws RemoteException{
+        ArrayList<LocalDateTime> times= new ArrayList<>();
+        for (Capsule c:mixingServerCapsuleList) {
+            times.add(c.getTime());
+        }
+        return times;
+    }
+
+
+
+
+
+
+    //////////////////////DOCTOR////////////////
+
+    public ArrayList<byte[]> getDoctorCapsuleListToken() throws RemoteException {
+        ArrayList<byte[]> tokens = new ArrayList<>();
+        for (Capsule c:doctorCapsuleList) {
+            tokens.add(c.getToken());
+        }
+        return tokens;
+    }
+
+    public ArrayList<byte[]> getDoctorCapsuleListSignature() throws RemoteException{
+        ArrayList<byte[]> signatures = new ArrayList<>();
+        for (Capsule c:doctorCapsuleList) {
+            signatures.add(c.getSignature());
+        }
+        return signatures;
+    }
+
+
+    public ArrayList<byte[]> getDoctorCapsuleListHash() throws RemoteException{
+        ArrayList<byte[]> hashes = new ArrayList<>();
+        for (Capsule c:doctorCapsuleList) {
+            hashes.add(c.getHash());
+        }
+        return hashes;
+    }
+
+
+    public ArrayList<LocalDateTime> getDoctorCapsuleListTime() throws RemoteException{
+        ArrayList<LocalDateTime> times= new ArrayList<>();
+        for (Capsule c:doctorCapsuleList) {
+            times.add(c.getTime());
+        }
+        return times;
+    }
+
+
+    public ArrayList<Integer> getDoctorCapsuleListRandom() throws RemoteException{
+        ArrayList<Integer> randoms = new ArrayList<>();
+        for (Capsule c:doctorCapsuleList) {
+            randoms.add(c.getRandom());
+        }
+        return randoms;
+
+
+
+
+
+    }
 
 }

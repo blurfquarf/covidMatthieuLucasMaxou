@@ -19,13 +19,15 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.List;
 
 public class MatchingService {
-    private ArrayList<Capsule> mixingServerCapsuleList;
+    private ArrayList<Capsule> mixingServerCapsuleList = new ArrayList<>();
     //all infected
-    private ArrayList<Capsule> doctorCapsuleList;
+    private ArrayList<Capsule> doctorCapsuleList = new ArrayList<>();
 
     private ArrayList<byte[]>  uninformedTokens = new ArrayList<>();
     private ArrayList<byte[]> informedTokens = new ArrayList<>();
@@ -52,7 +54,6 @@ public class MatchingService {
 
         System.out.println("Matching Service is ready");
 
-
         Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
         RegistrarInterface registrarImpl = (RegistrarInterface) registrarRegistry.lookup("RegistrarService");
 
@@ -60,7 +61,6 @@ public class MatchingService {
         JFrame contentFrame = new JFrame();
         JPanel contentPanel = new JPanel(new GridLayout(10, 1, 100, 5));
         JScrollPane contentScrollPane = new JScrollPane();
-
 
         JPanel userPanel = new JPanel(new GridLayout(10, 1, 100, 5));
         userPanel.setPreferredSize(new Dimension(100,100));
@@ -184,6 +184,43 @@ public class MatchingService {
 
 
     public void checkHash() throws RemoteException, NoSuchAlgorithmException, NotBoundException {
+        Registry matchingServerRegistry = LocateRegistry.getRegistry("localhost", 1100);
+        MatchingServiceInterface matchingServerImpl = (MatchingServiceInterface) matchingServerRegistry.lookup("MatchingService");
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+        //inlezen van arraylist met capsules ingezonden door mixingserver vanuit de MatchingServerImpl klasse
+        ArrayList<byte[]> capsuleTokensMIX = matchingServerImpl.getMixingServerCapsuleListToken();
+
+        ArrayList<byte[]> capsuleSignaturesMIX = matchingServerImpl.getMixingServerCapsuleListSignature();
+
+        ArrayList<byte[]> capsulesHashesMIX = matchingServerImpl.getMixingServerCapsuleListHash();
+
+        ArrayList<LocalDateTime> capsuleTimesMIX = matchingServerImpl.getMixingServerCapsuleListTime();
+
+        for (int i = 0; i < capsuleTokensMIX.size(); i++) {
+            mixingServerCapsuleList.add(new Capsule(capsuleTokensMIX.get(i), capsuleSignaturesMIX.get(i), capsulesHashesMIX.get(i), capsuleTimesMIX.get(i)));
+        }
+
+
+        //inlezen van arraylist met capsules ingezonden door Dokter vanuit de MatchingServerImpl klasse
+        ArrayList<byte[]> capsuleTokensDOC = matchingServerImpl.getDoctorCapsuleListToken();
+
+        ArrayList<byte[]> capsuleSignaturesDOC = matchingServerImpl.getDoctorCapsuleListSignature();
+
+        ArrayList<byte[]> capsulesHashesDOC = matchingServerImpl.getDoctorCapsuleListHash();
+
+        ArrayList<LocalDateTime> capsuleTimesDOC = matchingServerImpl.getDoctorCapsuleListTime();
+
+        ArrayList<Integer> capsuleRandomsDOC = matchingServerImpl.getDoctorCapsuleListRandom();
+
+
+        for (int i = 0; i < capsuleTokensDOC.size(); i++) {
+            doctorCapsuleList.add(new Capsule(capsuleTokensDOC.get(i), capsuleSignaturesDOC.get(i), capsulesHashesDOC.get(i), capsuleRandomsDOC.get(i), capsuleTimesDOC.get(i)));
+        }
+
+        ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
         Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
         RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
         //for all capsules sent from the mixingserver
@@ -211,9 +248,11 @@ public class MatchingService {
             ArrayList<byte[]> pseudonymsForDayC = registrarImpl.getPseudonymsPerDay(c.getTime());
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] temp = new byte[0];
-            while (!Arrays.equals(c.getHash(), temp) || pseudonymsForDayC.size()!=0){
-                String pseudoniemstring= new String(pseudonymsForDayC.get(0), StandardCharsets.UTF_8);
+            while (!Arrays.equals(c.getHash(), temp) && pseudonymsForDayC.size()!=0){
+
+                String pseudoniemstring = new String(pseudonymsForDayC.get(0), StandardCharsets.UTF_8);
                 int random = c.getRandom();
+                System.out.println("random: "+c.getRandom());
                 String s = String.valueOf(random) + pseudoniemstring;
                 temp = digest.digest(s.getBytes(StandardCharsets.UTF_8));
 
@@ -233,6 +272,14 @@ public class MatchingService {
                 markEntries(c);
             }
         }
+        for (ByteArrayHolder b : allEntries.keySet()) {
+            ArrayList<byte[]> temp = allEntries.get(b);
+            for (byte[] a: temp) {
+                System.out.print(Arrays.toString(a));
+            }
+            System.out.println();
+        }
+
     }
 
     public void markEntries(Capsule c) {
@@ -251,11 +298,7 @@ public class MatchingService {
                 }
             }
         }
-
-        if(!informedTokens.contains(c.getToken())){
-            informedTokens.add(c.getToken());
-        }
-        uninformedTokens.remove(c.getToken());
+        informedTokens.add(c.getToken());
     }
 
     public JList<String> showTokens(ArrayList<byte[]> tokens) {
