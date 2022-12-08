@@ -32,11 +32,19 @@ public class MixingServer {
         JLabel flushLabel = new JLabel("Press button to flush capsules to matching server!");
         JFrame frame = new JFrame();
         JButton flush = new JButton("Flush!");
+        JButton showContents = new JButton("Show content of Mixing server");
+        JButton showUsedTokens = new JButton("Show used tokens");
+        JButton showCapsules = new JButton("Show list of capsules");
+        JButton close = new JButton("Close");
+        JFrame contentFrame = new JFrame();
+        JPanel contentPanel = new JPanel(new GridLayout(10, 1, 100, 5));
+        JScrollPane contentScrollPane = new JScrollPane();
+
         flush.setEnabled(true);
         flushLabel.setPreferredSize(new Dimension(200, 50));
         JPanel mixingPanel = new JPanel(new GridLayout(10, 1, 100, 5));
 
-        frame.setTitle("Test");
+        frame.setTitle("Mixing Server");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         frame.setResizable(true);
@@ -45,6 +53,8 @@ public class MixingServer {
 
         mixingPanel.add(flush);
         mixingPanel.add(flushLabel);
+        mixingPanel.add(showContents);
+        showContents.setEnabled(true);
 
         frame.add(mixingPanel,BorderLayout.CENTER);
 
@@ -60,6 +70,53 @@ public class MixingServer {
                 } catch (RemoteException | NotBoundException ex) {
                     throw new RuntimeException(ex);
                 }
+            }
+        });
+        showContents.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+                contentPanel.setPreferredSize(new Dimension(100,100));
+                contentPanel.setBackground(Color.lightGray);
+                contentFrame.setTitle("Content of matching service");
+                contentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                contentFrame.setLayout(new BorderLayout());
+                contentFrame.setResizable(true);
+                contentFrame.setSize(1280,500);
+                contentFrame.setLocationRelativeTo(null);
+                contentFrame.revalidate();
+
+                contentPanel.add(showUsedTokens);
+                contentPanel.add(showCapsules);
+                contentPanel.add(close);
+                contentPanel.add(contentScrollPane);
+                contentFrame.add(contentPanel);
+                contentFrame.setVisible(true);
+            }
+        });
+        close.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                contentFrame.setVisible(false);
+            }
+        });
+
+        showUsedTokens.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    mixingServerImpl.showTokens();
+                } catch (RemoteException ex) {
+                    System.out.println("problem with showing used tokens");
+                    throw new RuntimeException(ex);
+                }
+
+            }
+        });
+        showCapsules.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
             }
         });
 

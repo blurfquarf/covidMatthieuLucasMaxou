@@ -1,6 +1,7 @@
 package MixingServer;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 public class Capsule {
 
@@ -46,5 +47,16 @@ public class Capsule {
 
     public int getRandom() {
         return this.Ri;
+    }
+
+    @Override
+    public String toString() {
+        return "Capsule{" +
+                "token=" + Arrays.toString(token) +
+                ", signature=" + Arrays.toString(signature) +
+                ", hash=" + Arrays.toString(hash) +
+                ", time=" + time +
+                ", Ri=" + Ri +
+                '}';
     }
 }

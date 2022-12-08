@@ -19,14 +19,11 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+import java.util.List;
 
 public class MatchingService {
     private ArrayList<Capsule> mixingServerCapsuleList;
-
     //all infected
     private ArrayList<Capsule> doctorCapsuleList;
 
@@ -38,6 +35,14 @@ public class MatchingService {
 
 
     JButton check = new JButton("Warn users");
+    JButton showContents = new JButton("Show content of matching service");
+    JButton showUninformed = new JButton("Show uninformed tokens");
+    JButton showInformed = new JButton("Show informed tokens");
+    JButton showMixingCapsules = new JButton("Show mixing capsules");
+    JButton showDoctorCapsules = new JButton("Show doctor capsules");
+    JButton showAllEntries = new JButton("Show all entries");
+    JButton showCriticalEntries = new JButton("Show critical entries");
+    JButton close = new JButton("Close");
 
 
     private void run() { try {
@@ -56,14 +61,16 @@ public class MatchingService {
 
 
         JFrame frame = new JFrame();
+        JFrame contentFrame = new JFrame();
+        JPanel contentPanel = new JPanel(new GridLayout(10, 1, 100, 5));
+        JScrollPane contentScrollPane = new JScrollPane();
 
 
         JPanel userPanel = new JPanel(new GridLayout(10, 1, 100, 5));
         userPanel.setPreferredSize(new Dimension(100,100));
         userPanel.setBackground(Color.lightGray);
 
-
-        frame.setTitle("Test");
+        frame.setTitle("Matching Server");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLayout(new BorderLayout());
         frame.setResizable(true);
@@ -72,16 +79,79 @@ public class MatchingService {
 
         userPanel.add(check);
         check.setEnabled(true);
+
+        userPanel.add(showContents);
+        showContents.setEnabled(true);
         frame.add(userPanel,BorderLayout.CENTER);
         frame.setVisible(true);
 
+        showContents.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
 
+                contentPanel.setPreferredSize(new Dimension(100,100));
+                contentPanel.setBackground(Color.lightGray);
+                contentFrame.setTitle("Content of matching service");
+                contentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+                contentFrame.setLayout(new BorderLayout());
+                contentFrame.setResizable(true);
+                contentFrame.setSize(1280,500);
+                contentFrame.setLocationRelativeTo(null);
+                contentFrame.revalidate();
+
+                contentPanel.add(showUninformed);
+                contentPanel.add(showInformed);
+                contentPanel.add(showMixingCapsules);
+                contentPanel.add(showDoctorCapsules);
+                contentPanel.add(close);
+                contentPanel.add(contentScrollPane);
+                contentFrame.add(contentPanel);
+                contentFrame.setVisible(true);
+            }
+        });
+
+        close.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                contentFrame.setVisible(false);
+            }
+        });
         check.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
 
             }
         });
+
+        showUninformed.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JList<byte[]> list = showTokens(uninformedTokens);
+                contentScrollPane.setViewportView(list);
+            }
+        });
+        showInformed.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JList<byte[]> list = showTokens(informedTokens);
+                contentScrollPane.setViewportView(list);
+            }
+        });
+        showDoctorCapsules.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JList<String> list = showCapsules(doctorCapsuleList);
+                contentScrollPane.setViewportView(list);
+            }
+        });
+        showMixingCapsules.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JList<String> list = showCapsules(mixingServerCapsuleList);
+                contentScrollPane.setViewportView(list);
+            }
+        });
+
 
 
 
@@ -134,7 +204,35 @@ public class MatchingService {
         uninformedTokens.remove(c.getToken());
     }
 
+    public JList<byte[]> showTokens(ArrayList<byte[]> tokens) {
+        JList tokenList = new JList<byte[]>();
+        DefaultListModel<byte[]> tokenModel = new DefaultListModel<>();
+        for (int i = 0; i < tokens.size(); i++) {
+            tokenModel.addElement(tokens.get(i));
+        }
+        tokenList.setModel(tokenModel);
+        return tokenList;
+    }
 
+    public JList<String> showCapsules(ArrayList<Capsule> capsules){
+        JList capsuleList = new JList<String>();
+        DefaultListModel<String> capsuleModel = new DefaultListModel<>();
+        for (int i = 0; i < capsules.size(); i++) {
+            capsuleModel.addElement(capsules.get(i).toString());
+        }
+        capsuleList.setModel(capsuleModel);
+        return capsuleList;
+    }
+
+    public JList<String> showEntries(){
+        JList entryList = new JList<String>();
+        DefaultListModel<String>  entryModel = new DefaultListModel<>();
+        for (int i = 0; i < allEntries.size(); i++) {
+
+        }
+
+        return entryList;
+    }
 
 
 

@@ -96,4 +96,7 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
     public ArrayList<Capsule> getDoctorCapsuleList() throws RemoteException{
         return doctorCapsuleList;
     }
+
+
+
 }

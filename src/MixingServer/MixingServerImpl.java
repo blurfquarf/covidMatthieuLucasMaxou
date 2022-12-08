@@ -168,4 +168,15 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         return this.publicKey;
     }
 
+    public JList<byte[]> showTokens() throws RemoteException{
+        JList tokenList = new JList<byte[]>();
+        DefaultListModel<byte[]> tokenModel = new DefaultListModel<>();
+        for (int i = 0; i < usedTokens.size(); i++) {
+            tokenModel.addElement(usedTokens.get(i));
+        }
+
+        tokenList.setModel(tokenModel);
+        return tokenList;
+    }
+
 }
