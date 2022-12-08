@@ -34,7 +34,11 @@ public interface MatchingServiceInterface extends Remote {
 
     ArrayList<LocalDateTime> getDoctorCapsuleListTime() throws RemoteException;
 
+    void sendCriticalTuples(byte[] hash, LocalDateTime time) throws RemoteException;
 
+    ArrayList<LocalDateTime> getTimes() throws RemoteException;
+
+    ArrayList<byte[]> getHashes() throws RemoteException;
 
     void sendHashesTokensTimes(byte[] hash, byte[] token, LocalDateTime localDateTime) throws RemoteException, NotBoundException;
 

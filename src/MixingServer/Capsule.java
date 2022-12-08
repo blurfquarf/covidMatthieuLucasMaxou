@@ -59,7 +59,6 @@ public class Capsule {
         return signature;
     }
 
-
     //get token in capsule
     public byte[] getToken() {
         return token;
@@ -67,6 +66,18 @@ public class Capsule {
 
     public int getRandom() {
         return this.Ri;
+    }
+
+    public LocalDateTime getUninformedTime() {
+        return this.uninformedTime;
+    }
+
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof Capsule a) {
+            return this.time.equals(a.getTime()) && Arrays.equals(this.token, a.getToken()) && Arrays.equals(this.hash, a.getHash()) && this.uninformedTime.equals(a.getUninformedTime());
+        } else return false;
     }
 
     @Override

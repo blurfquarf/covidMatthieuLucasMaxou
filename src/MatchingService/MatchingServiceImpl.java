@@ -1,5 +1,6 @@
 package MatchingService;
 import MixingServer.Capsule;
+import Registrar.ByteArrayHolder;
 import Registrar.RegistrarInterface;
 
 import java.math.BigInteger;
@@ -25,12 +26,17 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
     // als match gevonden => alle capsules die die hash bevatten en in het interval van de besmette user aanwezig waren markeren als "critical"
     // + Token van de user die dokter bezocht als "informed" markeren`
 
-
     // TODO: na bepaald tijdsinterval vb 1 dag, overblijvende tokens ("uninformed") doorsturen naar registrar
 
 
     ArrayList<Capsule> mixingServerCapsuleList;
     ArrayList<Capsule> doctorCapsuleList;
+    ArrayList<ByteArrayHolder> criticalTuples;
+
+    ArrayList<byte[]> newHashes;
+    ArrayList<byte[]> newTokens;
+    ArrayList<LocalDateTime> newTimes;
+
 
 
 
@@ -80,7 +86,7 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
         return signatureEngine.verify(completePacketSignature);
     }
 
-    public byte[] concatenate(byte[] time, byte[] hash, byte[] token, byte[] signature, byte[] random) {
+    public byte[] concatenate(byte[] time, byte[] hash, byte[] token, byte[] signature, byte[] random){
         ByteBuffer concatenation = ByteBuffer.allocate(time.length + hash.length + token.length + signature.length + random.length);
         concatenation.put(time);
         concatenation.put(hash);
@@ -92,7 +98,7 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
 
 
 
-    public ArrayList<byte[]> getMixingServerCapsuleListToken() throws RemoteException {
+    public ArrayList<byte[]> getMixingServerCapsuleListToken() throws RemoteException{
         ArrayList<byte[]> tokens = new ArrayList<>();
         for (Capsule c:mixingServerCapsuleList) {
             tokens.add(c.getToken());
@@ -128,12 +134,9 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
 
 
 
-
-
-
     //////////////////////DOCTOR////////////////
 
-    public ArrayList<byte[]> getDoctorCapsuleListToken() throws RemoteException {
+    public ArrayList<byte[]> getDoctorCapsuleListToken() throws RemoteException{
         ArrayList<byte[]> tokens = new ArrayList<>();
         for (Capsule c:doctorCapsuleList) {
             tokens.add(c.getToken());
@@ -174,11 +177,47 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
             randoms.add(c.getRandom());
         }
         return randoms;
-
-
-
-
-
     }
+
+    public void sendCriticalTuples(byte[] hash, LocalDateTime time) throws RemoteException{
+        criticalTuples.add(new ByteArrayHolder(time, hash));
+    }
+
+
+    public ArrayList<byte[]> getHashes() throws RemoteException{
+        ArrayList<byte[]> hashList = new ArrayList<>();
+        for (int i = 0; i < criticalTuples.size(); i++) {
+            hashList.add(criticalTuples.get(i).getByteArray());
+        }
+        return hashList;
+    }
+
+    public ArrayList<LocalDateTime> getTimes() throws RemoteException{
+        ArrayList<LocalDateTime> times = new ArrayList<>();
+        for (ByteArrayHolder b: criticalTuples) {
+            times.add(b.getTime());
+        }
+        return times;
+    }
+
+    public void sendHashesTokensTimes(byte[] hash, byte[] token, LocalDateTime localDateTime) throws RemoteException, NotBoundException {
+        newHashes.add(hash);
+        newTokens.add(token);
+        newTimes.add(localDateTime);
+    }
+
+
+    public ArrayList<LocalDateTime> getNewTimes() throws RemoteException{
+        return newTimes;
+    }
+    public ArrayList<byte[]> getNewHashes() throws RemoteException{
+        return newHashes;
+    }
+    public ArrayList<byte[]> getNewTokens() throws RemoteException{
+        return newTokens;
+    }
+
+
+
 
 }

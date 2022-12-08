@@ -35,9 +35,9 @@ public class UserClient implements ActionListener {
     private static String phoneNr;
     //Lists with scanned QR codes, and the random number and id's of the visited catering facilties.
     //These will be used when a user is contaminated, to search in the matching service.
-    private ArrayList<String> scannedQRCodes = new ArrayList<>();
-    private ArrayList<Integer> randomNumbers = new ArrayList<>();
-    private ArrayList<Integer> idOfCateringFacilities = new ArrayList<>();
+    //private ArrayList<String> scannedQRCodes = new ArrayList<>();
+    //private ArrayList<Integer> randomNumbers = new ArrayList<>();
+    //private ArrayList<Integer> idOfCateringFacilities = new ArrayList<>();
 
     private static PrivateKey privk;
     private static PublicKey pubk;
@@ -305,7 +305,7 @@ public class UserClient implements ActionListener {
                         if(scanned.get()){
                             String qrCode = new String(qr);
                             //System.out.println(qrCode);
-                            addToScanned(qrCode);
+                            //addToScanned(qrCode);
                             //parseQRCodes();
                             visit(registrarImpl, mixingServerImpl, qr);
                             //valid.setEnabled(true);
@@ -471,7 +471,7 @@ public class UserClient implements ActionListener {
         if(doesNotContain) visitEntries.put(LocalDateTime.now().toString(), new QROutput(q));
     }
 
-    public void addToScanned(String QRCode){
+  /*  //public void addToScanned(String QRCode){
         scannedQRCodes.add(QRCode);
     }*/
 

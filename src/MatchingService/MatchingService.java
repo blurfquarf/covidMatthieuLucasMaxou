@@ -1,6 +1,4 @@
 package MatchingService;
-import MixingServer.MixingServer;
-import MixingServer.MixingServerImpl;
 import Registrar.ByteArrayHolder;
 import Registrar.RegistrarInterface;
 import MixingServer.Capsule;
@@ -9,9 +7,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.FileNotFoundException;
-import java.math.BigInteger;
-import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -19,10 +14,9 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
-import java.util.List;
 
 public class MatchingService {
     private ArrayList<Capsule> mixingServerCapsuleList = new ArrayList<>();
@@ -36,7 +30,7 @@ public class MatchingService {
 
     //lijst van users die op eenzelfde moment eenzelfde zaak hebben bezocht
     //key = hash van CF + Time | value = ArrayList van usertokens
-    HashMap<ByteArrayHolder, ArrayList<byte[]>> allEntries = new HashMap<>();
+    HashMap<ByteArrayHolder, ArrayList<Capsule>> allEntries = new HashMap<>();
     ArrayList<ByteArrayHolder> criticalEntries = new ArrayList<>();
 
     JButton check = new JButton("Check infected users");
@@ -64,6 +58,9 @@ public class MatchingService {
 
         Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
         RegistrarInterface registrarImpl = (RegistrarInterface) registrarRegistry.lookup("RegistrarService");
+
+        Registry matchingServerRegistry = LocateRegistry.getRegistry("localhost", 1100);
+        MatchingServiceInterface matchingServerImpl = (MatchingServiceInterface) matchingServerRegistry.lookup("MatchingService");
 
         JFrame frame = new JFrame();
         JFrame contentFrame = new JFrame();
@@ -151,6 +148,7 @@ public class MatchingService {
                 contentFrame.setVisible(false);
             }
         });
+
         check.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -221,20 +219,18 @@ public class MatchingService {
             }
         });
 
-
-
-
-
-
     }catch (Exception e){
         e.printStackTrace();
         }
     }
 
+
+
     public static void main(String[] args) {
         MatchingService main =  new MatchingService();
         main.run();
     }
+
 
 
     public void checkHash() throws RemoteException, NoSuchAlgorithmException, NotBoundException {
@@ -289,7 +285,7 @@ public class MatchingService {
             //tijd en zaak er nog niet in => nieuwe entry
             if(allEntries.get(temp) == null) {
                 allEntries.put(temp, new ArrayList<>());
-                allEntries.get(temp).add(c.getToken());
+                allEntries.get(temp).add(new Capsule(c));
             }
             else {
                 allEntries.get(temp).add(new Capsule(c));
@@ -326,9 +322,9 @@ public class MatchingService {
             }
         }
         for (ByteArrayHolder b : allEntries.keySet()) {
-            ArrayList<byte[]> temp = allEntries.get(b);
-            for (byte[] a: temp) {
-                System.out.print(Arrays.toString(a));
+            ArrayList<Capsule> temp = allEntries.get(b);
+            for (Capsule a: temp) {
+                System.out.print(a.toString());
             }
             System.out.println();
         }
@@ -341,16 +337,16 @@ public class MatchingService {
         //checken of key (QR-code) gescand in in een periode van 5 sec nadat besmette client de QRcode scande en checken of beide entries dezelfde CF bezochtten
         //indien beide clients dezelfde CF bezochten in een tijdspanne van 5s => de (nog) niet besmette client(s) toevoegen aan de uninformed list
         for (ByteArrayHolder b : allEntries.keySet()) {
-            //tijd van mixing entry (allEntries) is binnen interval van tijd van doktercapsule, tokens bij entry uninformed zetten (marked!)
+            //tijd van mixing capsule (allEntries) is binnen interval van tijd van doktercapsule, tokens bij entry uninformed zetten (marked!)
             if((b.getTime().isEqual(temp2.getTime())||(b.getTime().isBefore(temp2.getTime().plusSeconds(5)) && b.getTime().isAfter(temp2.getTime())) || (b.getTime().isAfter(temp2.getTime().minusSeconds(5)) && b.getTime().isBefore(temp2.getTime()))) && Arrays.equals(b.getByteArray(), temp2.getByteArray())) {
-                for (byte[] a : allEntries.get(b)) {
-                    if(!uninformedTokens.contains(a) && !Arrays.equals(a, c.getToken())) {
-                        uninformedTokens.add(a);
+                for (Capsule a : allEntries.get(b)) {
+                    if(!Arrays.equals(a.getToken(), c.getToken())) {
+                        uninformedTokens.add(new Capsule(a.getToken(), a.getHash(), a.getTime(), LocalDateTime.now()));
                     }
                 }
             }
         }
-        informedTokens.add(c.getToken());
+        informedTokens.add(new Capsule(c.getToken(), c.getHash(), c.getTime(), LocalDateTime.now()));
     }
 
 /*    public JList<String> showTokens(ArrayList<Capsule> tokens) {
@@ -379,10 +375,10 @@ public class MatchingService {
         for(Map.Entry<ByteArrayHolder, ArrayList<Capsule>> entry : allEntries.entrySet()){
             StringBuilder sb = new StringBuilder();
             ByteArrayHolder holder = entry.getKey();
-            ArrayList<byte[]> array = entry.getValue();
+            ArrayList<Capsule> array = entry.getValue();
             sb.append(holder.toString());
             for (int j = 0; j < array.size(); j++) {
-                sb.append(Arrays.toString(array.get(j)));
+                sb.append(array.get(j).toString());
             }
             entryModel.addElement(sb.toString());
         }
