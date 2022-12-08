@@ -12,6 +12,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.text.ParseException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Map;
 
@@ -24,4 +25,5 @@ public interface MixingServerInterface extends Remote {
     void flushCapsules() throws RemoteException, NotBoundException;
     JList<String> showTokens() throws RemoteException;
     JList<String> showCapsules() throws RemoteException;
+    void sendHashesTokensTimes(byte[] hash, byte[] token, LocalDateTime localDateTime) throws RemoteException, NotBoundException;
     }

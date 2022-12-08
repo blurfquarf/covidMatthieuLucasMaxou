@@ -208,6 +208,19 @@ public class MatchingService {
             }
         });
 
+        refreshNewcomers.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    addNewComersToInformed();
+                } catch (RemoteException ex) {
+                    System.out.println("Er is iets fout gegaan bij het refreshen van de uninformed tokens!");
+                } catch (NotBoundException ex) {
+                    throw new RuntimeException(ex);
+                }
+            }
+        });
+
 
 
 
