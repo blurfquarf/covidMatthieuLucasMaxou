@@ -78,7 +78,7 @@ public class DoctorClient {
             userPanel.setBackground(Color.lightGray);
 
 
-            frame.setTitle("Test");
+            frame.setTitle("Doctor");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setLayout(new BorderLayout());
             frame.setResizable(true);

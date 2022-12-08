@@ -67,7 +67,10 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
             System.out.println("signing hash");
 
             //add capsule to mixing server list of capsules
+            //capsulelist gets flushed at flush
             capsuleList.add(capsule);
+
+            //usedtokens will be stored
             usedTokens.add(token);
             signedHash = signHash(hash).values().iterator().next();
         } else {
@@ -168,15 +171,25 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         return this.publicKey;
     }
 
-    public JList<byte[]> showTokens() throws RemoteException{
-        JList tokenList = new JList<byte[]>();
-        DefaultListModel<byte[]> tokenModel = new DefaultListModel<>();
+    public JList<String> showTokens() throws RemoteException{
+        JList tokenList = new JList<String>();
+        DefaultListModel<String> tokenModel = new DefaultListModel<>();
         for (int i = 0; i < usedTokens.size(); i++) {
-            tokenModel.addElement(usedTokens.get(i));
+            tokenModel.addElement(Arrays.toString(usedTokens.get(i)));
         }
 
         tokenList.setModel(tokenModel);
         return tokenList;
+    }
+
+    public JList<String> showCapsules() throws RemoteException{
+        JList capsules = new JList<String>();
+        DefaultListModel<String> capsuleModel = new DefaultListModel<>();
+        for (int i = 0; i < capsuleList.size(); i++) {
+            capsuleModel.addElement(capsuleList.get(i).toString());
+        }
+        capsules.setModel(capsuleModel);
+        return capsules;
     }
 
 }

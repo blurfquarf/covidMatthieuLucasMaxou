@@ -16,8 +16,26 @@ public interface MatchingServiceInterface extends Remote {
 
     void sendFromDoctor(LocalDateTime time, byte[] hash, byte[] token, byte[] signature, int random, byte[] completePacket, byte[] completePacketSignature, String name) throws RemoteException, NotBoundException, NoSuchAlgorithmException, SignatureException, InvalidKeyException;
 
-    ArrayList<Capsule> getMixingServerCapsuleList() throws RemoteException;
+    ArrayList<byte[]> getMixingServerCapsuleListToken() throws RemoteException;
 
-    ArrayList<Capsule> getDoctorCapsuleList() throws RemoteException;
+    ArrayList<byte[]> getMixingServerCapsuleListSignature() throws RemoteException;
 
-}
+    ArrayList<byte[]> getMixingServerCapsuleListHash() throws RemoteException;
+
+    ArrayList<LocalDateTime> getMixingServerCapsuleListTime() throws RemoteException;
+
+    ArrayList<Integer> getDoctorCapsuleListRandom() throws RemoteException;
+
+    ArrayList<byte[]> getDoctorCapsuleListToken() throws RemoteException;
+
+    ArrayList<byte[]> getDoctorCapsuleListSignature() throws RemoteException;
+
+    ArrayList<byte[]> getDoctorCapsuleListHash() throws RemoteException;
+
+    ArrayList<LocalDateTime> getDoctorCapsuleListTime() throws RemoteException;
+
+
+
+
+
+    }

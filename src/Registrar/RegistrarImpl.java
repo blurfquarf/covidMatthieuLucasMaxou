@@ -129,8 +129,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         byte[] pseudonym = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
         pseudonyms.add(new ByteArrayHolder(LocalDateTime.now(), pseudonym));
         days.put(btw, day);
-
-
         return pseudonym;
     }
 
@@ -149,8 +147,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             byte[] todayByteArray = todayTime.toString().getBytes(StandardCharsets.UTF_8);
             //maak tokens en voeg deze toe aan de tokenMapping in de Registrar.serverDB
            /* byte[] date = todayTime.toString().getBytes(StandardCharsets.UTF_8);
-
-
             date.toString();
 */
 
@@ -168,6 +164,8 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             byte[] signature = signatureEngine.sign();
 
             ts.put(token, signature);
+
+            //bijhouden welke tokens bij welke user horen
             tokenMappings.put(token, telefoonnr);
         }
         timeSinceLastGeneratedToken=now;
@@ -202,7 +200,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
     public ArrayList<byte[]> getPseudonymsPerDay(LocalDateTime day) throws RemoteException {
         ArrayList<byte[]> toSend = new ArrayList<>();
-        for (ByteArrayHolder p :pseudonyms) {
+        for (ByteArrayHolder p: pseudonyms) {
             if((p.getTime().isAfter(day.minusMinutes(2)) && p.getTime().isBefore(day)) || p.getTime().isEqual(day) || p.getTime().isEqual(day.minusMinutes(2))) {
                 toSend.add(p.getByteArray());
             }

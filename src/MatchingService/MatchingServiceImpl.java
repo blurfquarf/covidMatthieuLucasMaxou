@@ -42,8 +42,6 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
                                                  //QR hash        //registrar token and signature
     public void sendFromMixing(LocalDateTime time, byte[] hash, byte[] token, byte[] signature)throws RemoteException{
         mixingServerCapsuleList.add(new Capsule(token, signature, hash, time));
-
-        System.out.println("inbound hash from mixing server: " + Arrays.toString(mixingServerCapsuleList.get(0).getHash()));
     }
 
     public void sendFromDoctor(LocalDateTime time, byte[] hash, byte[] token, byte[] signature, int random, byte[] completePacket, byte[] completePacketSignature, String doctor) throws RemoteException, NotBoundException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
@@ -52,9 +50,9 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
         //only add to list if valid!
         if (checkValidity(time, hash, token, signature, random, completePacket, completePacketSignature, doctorPK)) {
             System.out.println("data from doctor valid!");
+            System.out.println("RANDOM: " + random);
             doctorCapsuleList.add(new Capsule(token, signature, hash, random, time));
         }
-        System.out.println("inbound hash from doctor: " + Arrays.toString(doctorCapsuleList.get(0).getHash()));
     }
 
 
@@ -89,13 +87,7 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
         return concatenation.array();
     }
 
-    public ArrayList<Capsule> getMixingServerCapsuleList() throws RemoteException{
-        return mixingServerCapsuleList;
-    }
 
-    public ArrayList<Capsule> getDoctorCapsuleList() throws RemoteException{
-        return doctorCapsuleList;
-    }
 
 
 

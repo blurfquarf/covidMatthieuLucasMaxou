@@ -5,6 +5,9 @@ import java.util.Arrays;
 
 public class ByteArrayHolder {
     private LocalDateTime time;
+
+
+    //hash van de zaak
     private byte[] byteArray;
 
     public ByteArrayHolder(LocalDateTime t, byte[] b){

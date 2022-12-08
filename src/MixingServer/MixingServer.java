@@ -26,6 +26,7 @@ public class MixingServer {
         Registry registry = LocateRegistry.createRegistry(1101);
         registry.rebind("MixingService", new MixingServerImpl());
         System.out.println("Mixing system  is ready");
+
         Registry mixingRegistry = LocateRegistry.getRegistry("localhost", 1101);
         MixingServerInterface mixingServerImpl = (MixingServerInterface) mixingRegistry.lookup("MixingService");
 
@@ -78,7 +79,7 @@ public class MixingServer {
 
                 contentPanel.setPreferredSize(new Dimension(100,100));
                 contentPanel.setBackground(Color.lightGray);
-                contentFrame.setTitle("Content of matching service");
+                contentFrame.setTitle("Content of mixing service");
                 contentFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                 contentFrame.setLayout(new BorderLayout());
                 contentFrame.setResizable(true);
@@ -105,7 +106,9 @@ public class MixingServer {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    mixingServerImpl.showTokens();
+
+                    JList<String> list = mixingServerImpl.showTokens();
+                    contentScrollPane.setViewportView(list);
                 } catch (RemoteException ex) {
                     System.out.println("problem with showing used tokens");
                     throw new RuntimeException(ex);
@@ -116,7 +119,13 @@ public class MixingServer {
         showCapsules.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try {
+                    JList<String> list = mixingServerImpl.showCapsules();
+                    contentScrollPane.setViewportView(list);
+                } catch (RemoteException ex) {
+                    System.out.println("problem with showing capsules");
+                    throw new RuntimeException(ex);
+                }
             }
         });
 

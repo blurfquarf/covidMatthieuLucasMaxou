@@ -63,11 +63,16 @@ public class UserClient implements ActionListener {
 
     static JButton visit = new JButton("Visit");
 
-    static JButton writeLogs = new JButton("Write out logs for doctor/TAKE A DUMP");
+    static JButton writeLogs = new JButton("Write out logs for doctor!");
 
-    static JLabel writeLogsLabel = new JLabel("");
+    static JTextArea writeLogsLabel = new JTextArea("");
 
     static JLabel icon = new JLabel("");
+
+    static JButton fetchCriticalTuples = new JButton("Fetch critical tuples");
+
+    static JLabel warningField = new JLabel("");
+
 
     public static void main(String[] args) throws InvalidAlgorithmParameterException, NotBoundException, SignatureException, RemoteException, InvalidKeyException {
         UserClient u = new UserClient();
@@ -122,7 +127,9 @@ public class UserClient implements ActionListener {
             send.setEnabled(true);
             getTokens.setEnabled(true);
 
+            fetchCriticalTuples.setEnabled(true);
 
+            writeLogsLabel.setLineWrap(true);
             icon.setOpaque(true);
 
             JPanel userPanel = new JPanel(new GridLayout(10, 1, 100, 5));
@@ -133,7 +140,7 @@ public class UserClient implements ActionListener {
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setLayout(new BorderLayout());
             frame.setResizable(true);
-            frame.setSize(1280,500);
+            frame.setSize(1280,700);
             frame.setLocationRelativeTo(null);
 
             frame.add(userPanel,BorderLayout.CENTER);
@@ -156,18 +163,36 @@ public class UserClient implements ActionListener {
             /*11*/userPanel.add(NewTokensLabel);
             /*12*/userPanel.add(writeLogsLabel);
             userPanel.add(icon);
+            userPanel.add(fetchCriticalTuples);
+            userPanel.add(warningField);
 
 
 
 
             frame.setVisible(true);
 
+
+            fetchCriticalTuples.addActionListener(new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    //validUserCapsules bekijken, dit is localstorage
+
+                    warningField.setText("You are infected, get inside and stay clear of others!");
+                }
+            });
+
+
+
+
+
+
             writeLogs.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     try {
                         writeLogs();
-                        writeLogsLabel.setText("Logs written to file for doctor! Get inside and stay clear from others!");
+                        writeLogsLabel.setText("Logs written to file for doctor! Get inside and stay clear from others! File for doctor: " + System.getProperty("user.dir") + "/" +  "UserLogFile_" + phoneNr);
                         writeLogsLabel.setBackground(Color.red);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -315,7 +340,7 @@ public class UserClient implements ActionListener {
 
                     //token is an entry here!                     //links = token, rechts = signature registrar
                     token = getToken();
-                    System.out.println("token: "+ token);
+                    System.out.println("used token: "+ Arrays.toString(token.getKey()));
 
                     byte[] signedHash = new byte[1];
 
@@ -370,6 +395,9 @@ public class UserClient implements ActionListener {
     }
 
     public static void addValidUserCapsules(Capsule capsule){
+
+
+        //handig voor latere checks
         validUserCapsules.put(capsule.getTime(), capsule);
     }
 

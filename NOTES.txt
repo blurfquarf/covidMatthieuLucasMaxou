@@ -13,6 +13,12 @@ REGISTRAR WILL BE MIDDLE MAN FOR PUBLIC KEY, DOCTOR SHOULDNT SEND PUBLIC KEY HIM
 
 
 
+Keuze swot analyse: allEntries per localdatetime
+
+
+
+
+
 
 ////////STAPPENPLAN_DEMO///////
 

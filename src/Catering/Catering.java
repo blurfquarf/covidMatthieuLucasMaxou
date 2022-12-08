@@ -40,7 +40,7 @@ public class Catering {
 
         //int randomNumber=(int) (1000*Math.random());
 
-        String pseudoniemstring= new String(pseudoniem, StandardCharsets.UTF_8);
+        String pseudoniemstring = new String(pseudoniem, StandardCharsets.UTF_8);
 
         //hash maken van random number en pseudoniem
         MessageDigest digest = MessageDigest.getInstance("SHA-256");
