@@ -22,5 +22,6 @@ public interface MixingServerInterface extends Remote {
     byte[] addCapsule(String time, byte[] token, byte[] signature, String hash) throws NoSuchAlgorithmException, SignatureException, RemoteException, InvalidKeyException, NotBoundException;
 
     void flushCapsules() throws RemoteException, NotBoundException;
-    JList<byte[]> showTokens() throws RemoteException;
+    JList<String> showTokens() throws RemoteException;
+    JList<String> showCapsules() throws RemoteException;
     }
