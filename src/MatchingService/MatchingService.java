@@ -29,8 +29,9 @@ public class MatchingService {
 
     private ArrayList<byte[]>  uninformedTokens = new ArrayList<>();
     private ArrayList<byte[]> informedTokens = new ArrayList<>();
-    //key: string vd hash, value: object met hash & time
-    ArrayList< ByteArrayHolder> allEntries = new ArrayList<>();
+
+    //key = hash van CF + Time | value = ArrayList van usertokens
+    HashMap<ByteArrayHolder, ArrayList<byte[]>> allEntries = new HashMap<>();
     ArrayList<ByteArrayHolder> criticalEntries = new ArrayList<>();
 
 
@@ -172,12 +173,23 @@ public class MatchingService {
     public void checkHash() throws RemoteException, NoSuchAlgorithmException, NotBoundException {
         Registry myRegistry = LocateRegistry.getRegistry("localhost", 1099);
         RegistrarInterface registrarImpl = (RegistrarInterface) myRegistry.lookup("RegistrarService");
+        //for all capsules sent from the mixingserver
+        //check if there is already an entry for that time at that CF (hash)
+        // if no entry yet => create a new one + add the token of that user
+        // if there is already an entrye for that time & place => add token of user to that entry
         for(Capsule c : mixingServerCapsuleList) {
+            ByteArrayHolder temp = new ByteArrayHolder(c.getTime(), c.getHash());
+            if(allEntries.get(temp) == null) {
+                allEntries.put(temp,new ArrayList<>());
+                allEntries.get(temp).add(c.getToken());
+            }
+            else {
+                allEntries.get(temp).add(c.getToken());
+            }
             if(!uninformedTokens.contains(c.getToken())) {
                 uninformedTokens.add(c.getToken());
             }
         }
-
 
         //has user been there
         for(Capsule c : doctorCapsuleList) {
@@ -192,11 +204,25 @@ public class MatchingService {
                 temp = digest.digest(s.getBytes(StandardCharsets.UTF_8));
                 pseudonymsForDayC.remove(0);
             }
-            if(Arrays.equals(c.getHash(), temp)) markEntries(c);
+            if(Arrays.equals(c.getHash(), temp)) {
+                markEntries(c);
+            }
         }
     }
 
     public void markEntries(Capsule c) {
+        ByteArrayHolder temp2 = new ByteArrayHolder(c.getTime(), c.getHash());
+        if(!criticalEntries.contains(temp2))criticalEntries.add(new ByteArrayHolder(c.getTime(), c.getHash()));
+
+        //if(allEntries.get(temp2)!=null) uninformedTokens.addAll(allEntries.get(temp2));
+        //alle keys overlopen
+        //checken of key (QR-code) gescand in in een periode van 5 sec nadat besmette client de QRcode scande en checken of beide entries dezelfde CF bezochtten
+        //indien beide clients dezelfde CF bezochten in een tijdspanne van 5s => de (nog) niet besmette client(s) toevoegen aan de uninformed list
+        for (ByteArrayHolder b : allEntries.keySet()) {
+            if(b.getTime().isBefore(temp2.getTime().plusSeconds(5)) && b.getTime().isAfter(temp2.getTime()) && Arrays.equals(b.getByteArray(), temp2.getByteArray())) {
+                uninformedTokens.addAll(allEntries.get(b));
+            }
+        }
 
         if(!informedTokens.contains(c.getToken())){
             informedTokens.add(c.getToken());

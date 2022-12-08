@@ -1,6 +1,7 @@
 package Registrar;
 
 import java.time.LocalDateTime;
+import java.util.Arrays;
 
 public class ByteArrayHolder {
     private LocalDateTime time;
@@ -20,11 +21,18 @@ public class ByteArrayHolder {
         return this.byteArray;
     }
 
-/*    @Override
+    @Override
     public boolean equals(Object o) {
-        if (o instanceof ByteArrayHolder) {
-            ByteArrayHolder b = (ByteArrayHolder) o;
-            return this.time.equals(b.getTime()) && this.
-        }
-    }*/
+        if (o instanceof ByteArrayHolder b) {
+            return this.time.equals(b.getTime()) && Arrays.equals(this.byteArray, b.getByteArray());
+        } else return false;
+    }
+
+    @Override
+    public String toString() {
+        return "ByteArrayHolder{" +
+                "time=" + time +
+                ", byteArray=" + Arrays.toString(byteArray) +
+                '}';
+    }
 }
