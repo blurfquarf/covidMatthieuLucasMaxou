@@ -1,7 +1,9 @@
 package User;
 
+import MatchingService.MatchingServiceInterface;
 import MixingServer.Capsule;
 import MixingServer.MixingServerInterface;
+import Registrar.ByteArrayHolder;
 import Registrar.RegistrarInterface;
 
 import java.awt.*;
@@ -44,6 +46,8 @@ public class UserClient implements ActionListener {
     //timestamp and corresponding capsules
     private static HashMap<LocalDateTime, Capsule> validUserCapsules = new HashMap<>();
 
+    private static ArrayList<ByteArrayHolder> criticalTuples = new ArrayList<>();
+
     //hoe lang elke capsule bewaard moet worden
     private int duration = 7;
 
@@ -51,6 +55,12 @@ public class UserClient implements ActionListener {
     private static Map<byte[], byte[]> newtokens;
     private static AtomicBoolean scanned = new AtomicBoolean(false);
     private static AtomicBoolean numberGiven = new AtomicBoolean(false);
+
+
+    private static ArrayList<byte[]> hashes;
+
+    private static ArrayList<LocalDateTime> times;
+
 
     private static QROutput q;
     private static String qr = "";
@@ -82,9 +92,9 @@ public class UserClient implements ActionListener {
     public void run() throws RemoteException, NotBoundException, InvalidAlgorithmParameterException, SignatureException, InvalidKeyException {
         try {
             Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
-
-
             Registry mixingRegistry = LocateRegistry.getRegistry("localhost", 1101);
+
+
 
             RegistrarInterface registrarImpl = (RegistrarInterface) registrarRegistry.lookup("RegistrarService");
             MixingServerInterface mixingServerImpl = (MixingServerInterface) mixingRegistry.lookup("MixingService");
@@ -167,23 +177,34 @@ public class UserClient implements ActionListener {
             userPanel.add(warningField);
 
 
-
-
             frame.setVisible(true);
 
 
             fetchCriticalTuples.addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
+                    try {
+                        fetchTuples();
 
-                    //validUserCapsules bekijken, dit is localstorage
+                        //compare valid user capsules and critical tuples
+                        ArrayList<Capsule> userTokens = compareTuples();
+                        if (!userTokens.isEmpty()){
+                            warningField.setText("You might be infected, get inside and stay clear of others!");
+                            for (int i = 0; i < userTokens.size(); i++) {
+                                mixingServerImpl.sendHashesTokensTimes(userTokens.get(i).getHash(), userTokens.get(i).getToken(), userTokens.get(i).getTime());
+                            }
+                        }else {
+                            warningField.setText("You are safe, no need to worry");
+                            warningField.setBackground(Color.green);
+                        }
 
-                    warningField.setText("You are infected, get inside and stay clear of others!");
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    } catch (NotBoundException ex) {
+                        throw new RuntimeException(ex);
+                    }
                 }
             });
-
-
-
 
 
 
@@ -302,6 +323,34 @@ public class UserClient implements ActionListener {
         }
     }
 
+    public static void fetchTuples() throws RemoteException, NotBoundException {
+        Registry matchingRegistry = LocateRegistry.getRegistry("localhost", 1100);
+        MatchingServiceInterface matchingServiceImpl = (MatchingServiceInterface) matchingRegistry.lookup("MatchingService");
+
+        hashes = new ArrayList<>(matchingServiceImpl.getHashes());
+        times = new ArrayList<>(matchingServiceImpl.getTimes());
+
+        for (int i = 0; i < hashes.size(); i++) {
+            criticalTuples.add(new ByteArrayHolder(times.get(i), hashes.get(i)));
+        }
+    }
+
+    public static ArrayList<Capsule> compareTuples() {
+        ArrayList<Capsule> userTokens = new ArrayList<>();
+        //hier
+        //opgevraagd
+        for (ByteArrayHolder tuple: criticalTuples) {
+            for (Capsule c: validUserCapsules.values()) {
+                if ((c.getTime().isEqual(tuple.getTime()) || (c.getTime().isBefore(tuple.getTime().plusSeconds(5)) && c.getTime().isAfter(tuple.getTime())) ||
+                        (c.getTime().isAfter(tuple.getTime().minusSeconds(5)) && c.getTime().isBefore(tuple.getTime()))) && Arrays.equals(c.getHash(), tuple.getByteArray())) {
+                    userTokens.add(new Capsule(c));
+                }
+            }
+        }
+        return userTokens;
+
+    }
+
     public static void enrollUser(RegistrarInterface registrarImpl, String number) throws RemoteException, NotBoundException, NoSuchAlgorithmException, InvalidAlgorithmParameterException, SignatureException, InvalidKeyException {
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
@@ -357,6 +406,8 @@ public class UserClient implements ActionListener {
 
                         byte[] hash = new BigInteger(q.getHash(), 2).toByteArray();
 
+
+                        //used for comparison later on!
                         addValidUserCapsules(new Capsule(token.getKey(), token.getValue(), hash, q.getRandom(), now));
 
                         //get token verwijdert telkens opgevraagde token
@@ -395,8 +446,6 @@ public class UserClient implements ActionListener {
     }
 
     public static void addValidUserCapsules(Capsule capsule){
-
-
         //handig voor latere checks
         validUserCapsules.put(capsule.getTime(), capsule);
     }
@@ -423,7 +472,7 @@ public class UserClient implements ActionListener {
 
     public void addToScanned(String QRCode){
         scannedQRCodes.add(QRCode);
-    }
+    }*/
 
     public static Map.Entry<byte[], byte[]> getToken() {
         Iterator<Map.Entry<byte[], byte[]>> it = tokens.entrySet().iterator();

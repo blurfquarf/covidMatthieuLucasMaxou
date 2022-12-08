@@ -37,6 +37,10 @@ public class MatchingServiceImpl extends UnicastRemoteObject implements Matching
     public MatchingServiceImpl() throws Exception{
         mixingServerCapsuleList = new ArrayList<>();
         doctorCapsuleList = new ArrayList<>();
+        criticalTuples = new ArrayList<>();
+        newHashes = new ArrayList<>();
+        newTokens = new ArrayList<>();
+        newTimes = new ArrayList<>();
     }
 
                                                  //QR hash        //registrar token and signature

@@ -30,8 +30,7 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
 
     ArrayList<byte[]> usedTokens;
     ArrayList<Capsule> capsuleList;
-    //equivalent van 3 dagen
-    int timeToHoldCapsules= 3;
+
 
     public MixingServerImpl() throws Exception{
         usedTokens= new ArrayList<>();
@@ -191,5 +190,21 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
         capsules.setModel(capsuleModel);
         return capsules;
     }
+
+    public void sendHashesTokensTimes(byte[] hash, byte[] token, LocalDateTime localDateTime) throws RemoteException, NotBoundException {
+        Registry matchingServerRegistry = LocateRegistry.getRegistry("localhost", 1100);
+        MatchingServiceInterface matchingServerImpl = (MatchingServiceInterface) matchingServerRegistry.lookup("MatchingService");
+
+        matchingServerImpl.sendHashesTokensTimes(hash, token, localDateTime);
+    }
+
+
+
+
+
+
+
+
+
 
 }

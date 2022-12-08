@@ -36,6 +36,13 @@ public interface MatchingServiceInterface extends Remote {
 
 
 
+    void sendHashesTokensTimes(byte[] hash, byte[] token, LocalDateTime localDateTime) throws RemoteException, NotBoundException;
+
+    ArrayList<LocalDateTime> getNewTimes() throws RemoteException;
+
+    ArrayList<byte[]> getNewHashes() throws RemoteException;
+
+    ArrayList<byte[]> getNewTokens() throws RemoteException;
 
 
     }

@@ -10,6 +10,10 @@ public class Capsule {
     private byte[] hash;
     private LocalDateTime time;
     private int Ri;
+
+
+    //moment the capsule gets set to uninformed
+    private LocalDateTime uninformedTime;
     
     public Capsule(byte[] t, byte[] s, byte[] h, int Ri, LocalDateTime time){
         this.token = t;
@@ -25,6 +29,22 @@ public class Capsule {
         this.signature = s;
         this.hash = h;
         this.time = time;
+    }
+
+    public Capsule(byte[] t, byte[] h, LocalDateTime time, LocalDateTime uninformedTime){
+        this.token = t;
+        this.hash = h;
+        this.time = time;
+        this.uninformedTime = uninformedTime;
+    }
+
+    public Capsule(Capsule c){
+        this.token = c.getToken();
+        this.signature = c.getSignature();
+        this.hash = c.getHash();
+        this.time = c.getTime();
+        this.Ri = c.getRandom();
+        this.uninformedTime = c.getUninformedTime();
     }
 
     public byte[] getHash() {
@@ -57,6 +77,7 @@ public class Capsule {
                 ", hash=" + Arrays.toString(hash) +
                 ", time=" + time +
                 ", Ri=" + Ri +
+                ", uninformedTime=" + uninformedTime +
                 '}';
     }
 }

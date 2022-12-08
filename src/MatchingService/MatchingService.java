@@ -29,8 +29,10 @@ public class MatchingService {
     //all infected
     private ArrayList<Capsule> doctorCapsuleList = new ArrayList<>();
 
-    private ArrayList<byte[]>  uninformedTokens = new ArrayList<>();
-    private ArrayList<byte[]> informedTokens = new ArrayList<>();
+
+
+    private ArrayList<Capsule>  uninformedTokens = new ArrayList<>();
+    private ArrayList<Capsule> informedTokens = new ArrayList<>();
 
     //lijst van users die op eenzelfde moment eenzelfde zaak hebben bezocht
     //key = hash van CF + Time | value = ArrayList van usertokens
@@ -46,6 +48,12 @@ public class MatchingService {
     JButton showAllEntries = new JButton("Show all entries");
     JButton showCriticalEntries = new JButton("Show critical entries");
     JButton close = new JButton("Close");
+    JButton refreshNewcomers = new JButton("Refresh newcomers");
+
+    JButton updateService = new JButton("Update critical tuples! (make available to users)");
+
+    JButton forwardToRegistrar = new JButton("Forward remaining uninformed tuples to registrar! These people haven't responded yet...");
+
 
     private void run() { try {
 
@@ -78,9 +86,38 @@ public class MatchingService {
 
         userPanel.add(showContents);
         showContents.setEnabled(true);
+
+        userPanel.add(updateService);
+        updateService.setEnabled(true);
+
+        userPanel.add(refreshNewcomers);
+        refreshNewcomers.setEnabled(true);
+
+        userPanel.add(forwardToRegistrar);
+        forwardToRegistrar.setEnabled(true);
+
         frame.add(userPanel,BorderLayout.CENTER);
         frame.setVisible(true);
 
+        forwardToRegistrar.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+
+            }
+        });
+
+        updateService.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                for (ByteArrayHolder b: criticalEntries) {
+                    try {
+                        matchingServerImpl.sendCriticalTuples(b.getByteArray(), b.getTime());
+                    } catch (RemoteException ex) {
+                        throw new RuntimeException(ex);
+                    }
+                }
+            }
+        });
 
         showContents.addActionListener(new ActionListener() {
             @Override
@@ -124,17 +161,18 @@ public class MatchingService {
                 }
             }
         });
+
         showUninformed.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JList<String> list = showTokens(uninformedTokens);
+                JList<String> list = showCapsules(uninformedTokens);
                 contentScrollPane.setViewportView(list);
             }
         });
         showInformed.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JList<String> list = showTokens(informedTokens);
+                JList<String> list = showCapsules(informedTokens);
                 contentScrollPane.setViewportView(list);
             }
         });
@@ -159,6 +197,9 @@ public class MatchingService {
                 contentScrollPane.setViewportView(list);
             }
         });
+
+
+        //enkel plaats en tijd (hash CF + time)
         showCriticalEntries.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -228,7 +269,6 @@ public class MatchingService {
         // if no entry yet => create a new one + add the token of that user
         // if there is already an entrye for that time & place => add token of user to that entry
         for(Capsule c : mixingServerCapsuleList) {
-
             System.out.println(mixingServerCapsuleList.size());
             //System.out.println("time: "+c.getTime()+", hash: "+ Arrays.toString(c.getHash()) +", token: "+ Arrays.toString(c.getToken()) +", random:"+c.getRandom());
             ByteArrayHolder temp = new ByteArrayHolder(c.getTime(), c.getHash());
@@ -239,7 +279,7 @@ public class MatchingService {
                 allEntries.get(temp).add(c.getToken());
             }
             else {
-                allEntries.get(temp).add(c.getToken());
+                allEntries.get(temp).add(new Capsule(c));
             }
         }
 
@@ -279,7 +319,6 @@ public class MatchingService {
             }
             System.out.println();
         }
-
     }
 
     public void markEntries(Capsule c) {
@@ -301,7 +340,7 @@ public class MatchingService {
         informedTokens.add(c.getToken());
     }
 
-    public JList<String> showTokens(ArrayList<byte[]> tokens) {
+/*    public JList<String> showTokens(ArrayList<Capsule> tokens) {
         JList tokenList = new JList<String>();
         DefaultListModel<String> tokenModel = new DefaultListModel<>();
         for (int i = 0; i < tokens.size(); i++) {
@@ -309,7 +348,7 @@ public class MatchingService {
         }
         tokenList.setModel(tokenModel);
         return tokenList;
-    }
+    }*/
 
     public JList<String> showCapsules(ArrayList<Capsule> capsules){
         JList capsuleList = new JList<String>();
@@ -324,7 +363,7 @@ public class MatchingService {
     public JList<String> showEntries(){
         JList entryList = new JList<String>();
         DefaultListModel<String> entryModel = new DefaultListModel<>();
-        for(Map.Entry<ByteArrayHolder, ArrayList<byte[]>> entry : allEntries.entrySet()){
+        for(Map.Entry<ByteArrayHolder, ArrayList<Capsule>> entry : allEntries.entrySet()){
             StringBuilder sb = new StringBuilder();
             ByteArrayHolder holder = entry.getKey();
             ArrayList<byte[]> array = entry.getValue();
@@ -347,4 +386,38 @@ public class MatchingService {
         entryList.setModel(entryModel);
         return entryList;
     }
+
+
+
+    public void addNewComersToInformed() throws RemoteException, NotBoundException {
+        Registry matchingServerRegistry = LocateRegistry.getRegistry("localhost", 1100);
+        MatchingServiceInterface matchingServerImpl = (MatchingServiceInterface) matchingServerRegistry.lookup("MatchingService");
+
+        ArrayList<byte[]> hashes = matchingServerImpl.getNewHashes();
+
+        ArrayList<byte[]> tokens = matchingServerImpl.getNewTokens();
+
+        ArrayList<LocalDateTime> times= matchingServerImpl.getNewTimes();
+
+        ArrayList<Capsule> toRemove = new ArrayList<>();
+
+        for (int i = 0; i < hashes.size(); i++) {
+
+            for (Capsule temp : uninformedTokens) {
+                System.out.println("temp: " + temp.toString());
+                System.out.println("newcomer time: " + times.get(i) + ", token: " + Arrays.toString(tokens.get(i)) + ", hash: " + Arrays.toString(hashes.get(i)));
+
+                if (temp.getTime().equals(times.get(i).truncatedTo(ChronoUnit.SECONDS)) && Arrays.equals(temp.getToken(), tokens.get(i)) && Arrays.equals(temp.getHash(), hashes.get(i))) {
+                    toRemove.add(temp);
+                    informedTokens.add(new Capsule(temp));
+                }
+            }
+        }
+        for (Capsule i: toRemove) {
+            uninformedTokens.remove(i);
+        }
+    }
+
+    
+
 }
