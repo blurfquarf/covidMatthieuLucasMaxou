@@ -141,7 +141,6 @@ public class DoctorClient {
                         } catch (SignatureException ex) {
                             throw new RuntimeException(ex);
                         }
-
                         try {
                             matchingServiceImpl.sendFromDoctor(time, hash, token, signature, random, completePacket, completePacketSignature, name);
                             System.out.println("Sent hash: " + Arrays.toString(hash));

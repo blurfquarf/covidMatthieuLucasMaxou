@@ -195,7 +195,7 @@ public class UserClient implements ActionListener {
                                 mixingServerImpl.sendHashesTokensTimes(userTokens.get(i).getHash(), userTokens.get(i).getToken(), userTokens.get(i).getTime());
                             }
                         }else {
-                            warningField.setText("You are safe, no need to worry");
+                            warningField.setText("You are safe, no need to worry!");
                             warningField.setBackground(Color.green);
                         }
 

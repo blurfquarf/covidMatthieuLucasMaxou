@@ -65,6 +65,7 @@ public class MixingServer {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    flushLabel.setText("Mixing info flushed to matching server!");
                     mixingServerImpl.flushCapsules();
                 } catch (RemoteException | NotBoundException ex) {
                     throw new RuntimeException(ex);

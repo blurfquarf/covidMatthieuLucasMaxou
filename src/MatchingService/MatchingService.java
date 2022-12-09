@@ -47,6 +47,8 @@ public class MatchingService {
 
     JButton forwardToRegistrar = new JButton("Forward remaining uninformed tuples to registrar! These people haven't responded within 2 days of being critical!");
 
+    JLabel infoLabel = new JLabel("");
+
 
     private void run() { try {
 
@@ -91,13 +93,18 @@ public class MatchingService {
         userPanel.add(forwardToRegistrar);
         forwardToRegistrar.setEnabled(true);
 
+        userPanel.add(infoLabel);
+
         frame.add(userPanel,BorderLayout.CENTER);
         frame.setVisible(true);
+
+
 
         forwardToRegistrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    infoLabel.setText("2 day old uninformed users available for registrar to contact (see registrar terminal)");
                     sendRemainingUninformedTokensTimes();
                 } catch (RemoteException | NotBoundException ex) {
                     throw new RuntimeException(ex);
@@ -110,6 +117,7 @@ public class MatchingService {
             public void actionPerformed(ActionEvent e) {
                 for (ByteArrayHolder b: criticalEntries) {
                     try {
+                        infoLabel.setText("Info pushed to users!");
                         matchingServerImpl.sendCriticalTuples(b.getByteArray(), b.getTime());
                     } catch (RemoteException ex) {
                         throw new RuntimeException(ex);
@@ -155,6 +163,7 @@ public class MatchingService {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    infoLabel.setText("Infections checked!");
                     checkHash();
                 } catch (RemoteException | NotBoundException | NoSuchAlgorithmException ex) {
                     throw new RuntimeException(ex);
@@ -212,6 +221,7 @@ public class MatchingService {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
+                    infoLabel.setText("User awareness check performed!");
                     addNewComersToInformed();
                 } catch (RemoteException ex) {
                     System.out.println("Er is iets fout gegaan bij het refreshen van de uninformed tokens!");
@@ -283,7 +293,6 @@ public class MatchingService {
         ArrayList<LocalDateTime> capsuleTimesDOC = matchingServerImpl.getDoctorCapsuleListTime();
 
         ArrayList<Integer> capsuleRandomsDOC = matchingServerImpl.getDoctorCapsuleListRandom();
-
 
         for (int i = 0; i < capsuleTokensDOC.size(); i++) {
             doctorCapsuleList.add(new Capsule(capsuleTokensDOC.get(i), capsuleSignaturesDOC.get(i), capsulesHashesDOC.get(i), capsuleRandomsDOC.get(i), capsuleTimesDOC.get(i)));
