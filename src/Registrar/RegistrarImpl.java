@@ -108,10 +108,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
         //should be 14
         if (dateTime.isBefore(LocalDateTime.now().minusMinutes((long) 13.9))){
-            //byte[] ms = registrarDB.getSecretKey(b);
-            //SecretKey masterSecret = new SecretKeySpec(ms, 0, ms.length, "AES");
-
-            //SecretKey masterSecret = registrarDB.getSecretKey(b);
             ArrayList<byte[]> derivedKeys = new ArrayList<>();
             for (int i = 0; i < 7; i++) {
                 derivedKeys.add(generateSecretKey(btw, i).getEncoded());
@@ -146,9 +142,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             LocalDateTime todayTime = LocalDateTime.now();
             byte[] todayByteArray = todayTime.toString().getBytes(StandardCharsets.UTF_8);
             //maak tokens en voeg deze toe aan de tokenMapping in de Registrar.serverDB
-           /* byte[] date = todayTime.toString().getBytes(StandardCharsets.UTF_8);
-            date.toString();
-*/
 
             String sb = Double.toString(randomNumber);
             byte[] randomByteArray = digest.digest(sb.getBytes(StandardCharsets.UTF_8));
@@ -173,7 +166,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     }
 
     public static byte[] joinByteArray(byte[] byte1, byte[] byte2) {
-
         return ByteBuffer.allocate(byte1.length + byte2.length)
                 .put(byte1)
                 .put(byte2)

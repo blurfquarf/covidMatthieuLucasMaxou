@@ -45,7 +45,7 @@ public class MatchingService {
 
     JButton updateService = new JButton("Update critical tuples! (make available to users)");
 
-    JButton forwardToRegistrar = new JButton("Forward remaining uninformed tuples to registrar! These people haven't responded yet...");
+    JButton forwardToRegistrar = new JButton("Forward remaining uninformed tuples to registrar! These people haven't responded within 2 days of being critical!");
 
 
     private void run() { try {
@@ -310,6 +310,7 @@ public class MatchingService {
             else {
                 allEntries.get(temp).add(new Capsule(c));
             }
+            else {}
         }
 
         //has user been there
@@ -318,7 +319,6 @@ public class MatchingService {
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] temp = new byte[0];
             while (!Arrays.equals(c.getHash(), temp) && pseudonymsForDayC.size()!=0){
-
                 String pseudoniemstring = new String(pseudonymsForDayC.get(0), StandardCharsets.UTF_8);
                 int random = c.getRandom();
                 System.out.println("random: "+c.getRandom());
@@ -337,7 +337,6 @@ public class MatchingService {
             }
             if(Arrays.equals(c.getHash(), temp)) {
                 System.out.println("hash of infected user is legit");
-                //doktercapsules markeren
                 markEntries(c);
             }
         }

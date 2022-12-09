@@ -147,7 +147,7 @@ public class UserClient implements ActionListener {
             userPanel.setPreferredSize(new Dimension(100,100));
             userPanel.setBackground(Color.lightGray);
 
-            frame.setTitle("Test");
+            frame.setTitle("User client");
             frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setLayout(new BorderLayout());
             frame.setResizable(true);
@@ -236,9 +236,9 @@ public class UserClient implements ActionListener {
                         } catch (NoSuchAlgorithmException | RemoteException | InvalidKeyException | SignatureException ex) {
                             throw new RuntimeException(ex);
                         }
-                        NewTokensLabel.setText("New tokens have been added");
+                        NewTokensLabel.setText("New tokens have been added!");
                     } else {
-                        NewTokensLabel.setText("24 hours haven't passed yet");
+                        NewTokensLabel.setText("24 hours haven't passed yet!");
                     }
                 }
             });
@@ -273,7 +273,7 @@ public class UserClient implements ActionListener {
                             enrollUser(registrarImpl, number);
                             scan.setEnabled(true);
                         }
-                        enterQR.setText("Enter QR-code below");
+                        enterQR.setText("Enter QR-code below:");
                     } catch (RemoteException | NotBoundException | NoSuchAlgorithmException | SignatureException |
                              InvalidKeyException | InvalidAlgorithmParameterException ex) {
                         throw new RuntimeException(ex);

@@ -59,8 +59,6 @@ public class MixingServer {
 
         frame.add(mixingPanel,BorderLayout.CENTER);
 
-
-
         frame.setVisible(true);
 
         flush.addActionListener(new ActionListener() {

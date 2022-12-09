@@ -102,6 +102,7 @@ public class DoctorClient {
                 public void actionPerformed(ActionEvent e) {
                     send.setEnabled(true);
                     try {
+                        readField.setText("User data read!");
                         readUserLogs(sendField.getText());
                     } catch (FileNotFoundException ex) {
                         throw new RuntimeException(ex);
@@ -150,6 +151,7 @@ public class DoctorClient {
                                  InvalidKeyException ex){
                             throw new RuntimeException(ex);
                         }
+                        readField.setText("Data sent to matching service!");
                         send.setEnabled(false);
                     }
                 }
