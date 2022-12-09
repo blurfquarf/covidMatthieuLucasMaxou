@@ -13,7 +13,6 @@ public class Registrar {
         kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
         KeyPair pair = kpg.generateKeyPair();
 
-        //serverDB registrarDB = new serverDB();
         PrivateKey serverSK = pair.getPrivate();
         PublicKey serverPK = pair.getPublic();
 
