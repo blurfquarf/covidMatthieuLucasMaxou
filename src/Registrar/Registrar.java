@@ -9,8 +9,6 @@ import java.security.spec.RSAKeyGenParameterSpec;
 
 public class Registrar {
     private void run() { try {
-        //System.setProperty("java.rmi.server.hostname", "192.168.1.51");
-
         KeyPairGenerator kpg = KeyPairGenerator.getInstance("RSA");
         kpg.initialize(new RSAKeyGenParameterSpec(2048, RSAKeyGenParameterSpec.F4));
         KeyPair pair = kpg.generateKeyPair();
