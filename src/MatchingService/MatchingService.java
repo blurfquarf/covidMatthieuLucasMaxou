@@ -53,7 +53,6 @@ public class MatchingService {
 
         Registry registry = LocateRegistry.createRegistry(1100);
         registry.rebind("MatchingService", new MatchingServiceImpl());
-
         System.out.println("Matching Service is ready");
 
         Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
@@ -99,7 +98,11 @@ public class MatchingService {
         forwardToRegistrar.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-
+                try {
+                    sendRemainingUninformedTokensTimes();
+                } catch (RemoteException | NotBoundException ex) {
+                    throw new RuntimeException(ex);
+                }
             }
         });
 
@@ -231,6 +234,24 @@ public class MatchingService {
         main.run();
     }
 
+    public void sendRemainingUninformedTokensTimes() throws RemoteException, NotBoundException {
+        Registry registrarRegistry = LocateRegistry.getRegistry("localhost", 1099);
+        RegistrarInterface registrarImpl = (RegistrarInterface) registrarRegistry.lookup("RegistrarService");
+        ArrayList<Capsule> toRemove = new ArrayList<>();
+
+        for (Capsule c: uninformedTokens) {
+            registrarImpl.sendRemainingUninformedTokens(c.getToken());
+
+            //if uninformed is >= 2 days
+            if(c.getUninformedTime().isBefore(LocalDateTime.now().minusMinutes(2))) {
+                toRemove.add(new Capsule(c));
+            }
+        }
+        for (Capsule c: toRemove) {
+            uninformedTokens.remove(c);
+            informedTokens.add(new Capsule(c));
+        }
+    }
 
 
     public void checkHash() throws RemoteException, NoSuchAlgorithmException, NotBoundException {
@@ -341,6 +362,7 @@ public class MatchingService {
             if((b.getTime().isEqual(temp2.getTime())||(b.getTime().isBefore(temp2.getTime().plusSeconds(5)) && b.getTime().isAfter(temp2.getTime())) || (b.getTime().isAfter(temp2.getTime().minusSeconds(5)) && b.getTime().isBefore(temp2.getTime()))) && Arrays.equals(b.getByteArray(), temp2.getByteArray())) {
                 for (Capsule a : allEntries.get(b)) {
                     if(!Arrays.equals(a.getToken(), c.getToken())) {
+                                                                                                    //uninformed time
                         uninformedTokens.add(new Capsule(a.getToken(), a.getHash(), a.getTime(), LocalDateTime.now()));
                     }
                 }
@@ -348,16 +370,6 @@ public class MatchingService {
         }
         informedTokens.add(new Capsule(c.getToken(), c.getHash(), c.getTime(), LocalDateTime.now()));
     }
-
-/*    public JList<String> showTokens(ArrayList<Capsule> tokens) {
-        JList tokenList = new JList<String>();
-        DefaultListModel<String> tokenModel = new DefaultListModel<>();
-        for (int i = 0; i < tokens.size(); i++) {
-            tokenModel.addElement(Arrays.toString(tokens.get(i)));
-        }
-        tokenList.setModel(tokenModel);
-        return tokenList;
-    }*/
 
     public JList<String> showCapsules(ArrayList<Capsule> capsules){
         JList capsuleList = new JList<String>();
@@ -396,8 +408,6 @@ public class MatchingService {
         return entryList;
     }
 
-
-
     public void addNewComersToInformed() throws RemoteException, NotBoundException {
         Registry matchingServerRegistry = LocateRegistry.getRegistry("localhost", 1100);
         MatchingServiceInterface matchingServerImpl = (MatchingServiceInterface) matchingServerRegistry.lookup("MatchingService");
@@ -426,7 +436,4 @@ public class MatchingService {
             uninformedTokens.remove(i);
         }
     }
-
-    
-
 }

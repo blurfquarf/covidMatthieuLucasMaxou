@@ -8,8 +8,6 @@ import java.security.*;
 import java.security.spec.RSAKeyGenParameterSpec;
 
 public class Registrar {
-
-
     private void run() { try {
         //System.setProperty("java.rmi.server.hostname", "192.168.1.51");
 

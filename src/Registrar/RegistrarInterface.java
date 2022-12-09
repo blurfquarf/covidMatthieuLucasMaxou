@@ -30,8 +30,9 @@ public interface RegistrarInterface extends Remote {
 
     ArrayList<byte[]> getPseudonymsPerDay(LocalDateTime day) throws RemoteException;
 
+    void sendRemainingUninformedTokens(byte[] token) throws RemoteException;
 
 
-}
+    }
 
 
