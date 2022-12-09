@@ -76,7 +76,12 @@ public class Capsule {
     @Override
     public boolean equals(Object o) {
         if (o instanceof Capsule a) {
-            return this.time.equals(a.getTime()) && Arrays.equals(this.token, a.getToken()) && Arrays.equals(this.hash, a.getHash()) && this.uninformedTime.equals(a.getUninformedTime());
+            if(!(this.uninformedTime ==null)){
+                return this.time.equals(a.getTime()) && Arrays.equals(this.token, a.getToken()) && Arrays.equals(this.hash, a.getHash()) && this.uninformedTime.equals(a.getUninformedTime());
+            }
+            else {
+                return this.time.equals(a.getTime()) && Arrays.equals(this.token, a.getToken()) && Arrays.equals(this.hash, a.getHash());
+            }
         } else return false;
     }
 

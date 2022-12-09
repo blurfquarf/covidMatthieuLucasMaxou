@@ -279,7 +279,9 @@ public class MatchingService {
         ArrayList<LocalDateTime> capsuleTimesMIX = matchingServerImpl.getMixingServerCapsuleListTime();
 
         for (int i = 0; i < capsuleTokensMIX.size(); i++) {
-            mixingServerCapsuleList.add(new Capsule(capsuleTokensMIX.get(i), capsuleSignaturesMIX.get(i), capsulesHashesMIX.get(i), capsuleTimesMIX.get(i)));
+            if (!mixingServerCapsuleList.contains(new Capsule(capsuleTokensMIX.get(i), capsuleSignaturesMIX.get(i), capsulesHashesMIX.get(i), capsuleTimesMIX.get(i)))) {
+                mixingServerCapsuleList.add(new Capsule(capsuleTokensMIX.get(i), capsuleSignaturesMIX.get(i), capsulesHashesMIX.get(i), capsuleTimesMIX.get(i)));
+            }
         }
 
 
@@ -295,7 +297,9 @@ public class MatchingService {
         ArrayList<Integer> capsuleRandomsDOC = matchingServerImpl.getDoctorCapsuleListRandom();
 
         for (int i = 0; i < capsuleTokensDOC.size(); i++) {
-            doctorCapsuleList.add(new Capsule(capsuleTokensDOC.get(i), capsuleSignaturesDOC.get(i), capsulesHashesDOC.get(i), capsuleRandomsDOC.get(i), capsuleTimesDOC.get(i)));
+            if (!doctorCapsuleList.contains(new Capsule(capsuleTokensDOC.get(i), capsuleSignaturesDOC.get(i), capsulesHashesDOC.get(i), capsuleRandomsDOC.get(i), capsuleTimesDOC.get(i)))){
+                doctorCapsuleList.add(new Capsule(capsuleTokensDOC.get(i), capsuleSignaturesDOC.get(i), capsulesHashesDOC.get(i), capsuleRandomsDOC.get(i), capsuleTimesDOC.get(i)));
+            }
         }
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -316,10 +320,9 @@ public class MatchingService {
                 allEntries.put(temp, new ArrayList<>());
                 allEntries.get(temp).add(new Capsule(c));
             }
-            else {
+            else if(!allEntries.get(temp).contains(c)){
                 allEntries.get(temp).add(new Capsule(c));
             }
-            else {}
         }
 
         //has user been there
@@ -368,14 +371,16 @@ public class MatchingService {
             //tijd van mixing capsule (allEntries) is binnen interval van tijd van doktercapsule, tokens bij entry uninformed zetten (marked!)
             if((b.getTime().isEqual(temp2.getTime())||(b.getTime().isBefore(temp2.getTime().plusSeconds(5)) && b.getTime().isAfter(temp2.getTime())) || (b.getTime().isAfter(temp2.getTime().minusSeconds(5)) && b.getTime().isBefore(temp2.getTime()))) && Arrays.equals(b.getByteArray(), temp2.getByteArray())) {
                 for (Capsule a : allEntries.get(b)) {
-                    if(!Arrays.equals(a.getToken(), c.getToken())) {
-                                                                                                    //uninformed time
+                    if(!Arrays.equals(a.getToken(), c.getToken()) && !uninformedTokens.contains(a)) {
+                                                                                                //uninformed time
                         uninformedTokens.add(new Capsule(a.getToken(), a.getHash(), a.getTime(), LocalDateTime.now()));
                     }
                 }
             }
         }
-        informedTokens.add(new Capsule(c.getToken(), c.getHash(), c.getTime(), LocalDateTime.now()));
+        if (!uninformedTokens.contains(c)) {
+            informedTokens.add(new Capsule(c.getToken(), c.getHash(), c.getTime(), LocalDateTime.now()));
+        }
     }
 
     public JList<String> showCapsules(ArrayList<Capsule> capsules){

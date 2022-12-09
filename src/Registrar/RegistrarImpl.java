@@ -37,12 +37,10 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
     private ArrayList<String> registeredPhonenumbers;
 
-
     //tokenmapping by phone number
     private HashMap<byte[], String> tokenMappings;
 
     private HashMap<String, PublicKey> doctorPubks;
-
 
 
     public RegistrarImpl(PrivateKey mk, PublicKey pk) throws Exception {
@@ -160,6 +158,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
             //bijhouden welke tokens bij welke user horen
             tokenMappings.put(token, telefoonnr);
+            //System.out.println("token added: "+Arrays.toString(token)+" for user: "+ telefoonnr);
         }
         timeSinceLastGeneratedToken=now;
         return ts;
@@ -195,14 +194,17 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         for (ByteArrayHolder p: pseudonyms) {
             if((p.getTime().isAfter(day.minusMinutes(2)) && p.getTime().isBefore(day)) || p.getTime().isEqual(day) || p.getTime().isEqual(day.minusMinutes(2))) {
                 toSend.add(p.getByteArray());
-                System.out.println("pseudonym added: "+Arrays.toString(p.getByteArray()));
             }
         }
         return toSend;
     }
 
     public void sendRemainingUninformedTokens(byte[] token) throws RemoteException {
-        System.out.println(tokenMappings.get(token));
+        for (Map.Entry<byte[], String> entry: tokenMappings.entrySet()) {
+            if (Arrays.equals(entry.getKey(), token)) {
+                System.out.println("call " + entry.getValue() + ", to inform the user");
+            }
+        }
     }
 
 
