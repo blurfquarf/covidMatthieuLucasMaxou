@@ -208,4 +208,11 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         }
         return toSend;
     }
+
+    public void sendRemainingUninformedTokens(byte[] token) throws RemoteException {
+        System.out.println(tokenMappings.get(token));
+    }
+
+
+
 }

@@ -24,7 +24,6 @@ public class MatchingService {
     private ArrayList<Capsule> doctorCapsuleList = new ArrayList<>();
 
 
-
     private ArrayList<Capsule>  uninformedTokens = new ArrayList<>();
     private ArrayList<Capsule> informedTokens = new ArrayList<>();
 
