@@ -370,7 +370,7 @@ public class MatchingService {
             //tijd van mixing capsule (allEntries) is binnen interval van tijd van doktercapsule, tokens bij entry uninformed zetten (marked!)
             if((b.getTime().isEqual(temp2.getTime())||(b.getTime().isBefore(temp2.getTime().plusSeconds(5)) && b.getTime().isAfter(temp2.getTime())) || (b.getTime().isAfter(temp2.getTime().minusSeconds(5)) && b.getTime().isBefore(temp2.getTime()))) && Arrays.equals(b.getByteArray(), temp2.getByteArray())) {
                 for (Capsule a : allEntries.get(b)) {
-                    if(!Arrays.equals(a.getToken(), c.getToken()) && !uninformedTokens.contains(a)) {
+                    if(!Arrays.equals(a.getToken(), c.getToken()) && !uninformedTokens.contains(a) && !informedTokens.contains(a)) {
                                                                                                 //uninformed time
                         uninformedTokens.add(new Capsule(a.getToken(), a.getHash(), a.getTime(), LocalDateTime.now()));
                     }
