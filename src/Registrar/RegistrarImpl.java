@@ -2,6 +2,7 @@ package Registrar;//import java.rmi.RMISecurityManager;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
+import javax.swing.*;
 import java.nio.charset.StandardCharsets;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
@@ -18,6 +19,8 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     PrivateKey mk;
     PublicKey pk;
     LocalDateTime timeSinceLastGeneratedToken;
+
+    private String message = "";
 
 
     //lijsten stellen kolommen in databank voor
@@ -188,10 +191,41 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         for (Map.Entry<byte[], String> entry: tokenMappings.entrySet()) {
             if (Arrays.equals(entry.getKey(), token)) {
                 System.out.println("Call " + entry.getValue() + ", to inform the user!");
+                message = "Call " + entry.getValue() + ", to inform the user!";
             }
         }
+
+    }
+    public JList<String> showPseudonyms() throws RemoteException {
+        JList pseudoList = new JList<String>();
+        DefaultListModel<String> pseudoModel = new DefaultListModel<>();
+        for (int i = 0; i < pseudonyms.size(); i++) {
+            pseudoModel.addElement(pseudonyms.get(i).toString());
+        }
+
+        pseudoList.setModel(pseudoModel);
+        return pseudoList;
     }
 
+    public JList<String> showTokenMappings() throws RemoteException {
+        JList mappingList = new JList<String>();
+        DefaultListModel<String> mappingModel = new DefaultListModel<>();
 
+        for (Map.Entry<byte[], String> entry : tokenMappings.entrySet()){
+            StringBuilder sb = new StringBuilder();
+            byte[] array = entry.getKey();
+            String string = entry.getValue();
+            sb.append(array.toString());
+            sb.append(string);
 
+            mappingModel.addElement(sb.toString());
+        }
+
+        mappingList.setModel(mappingModel);
+        return mappingList;
+    }
+
+    public String getMessage() throws RemoteException{
+        return message;
+    }
 }

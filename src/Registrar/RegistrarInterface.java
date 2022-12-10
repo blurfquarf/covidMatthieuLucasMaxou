@@ -1,6 +1,7 @@
 package Registrar;
 
 import javax.crypto.SecretKey;
+import javax.swing.*;
 import java.rmi.Remote;
 import java.rmi.RemoteException;
 import java.security.*;
@@ -33,6 +34,10 @@ public interface RegistrarInterface extends Remote {
     void sendRemainingUninformedTokens(byte[] token) throws RemoteException;
 
 
-    }
+    JList<String> showPseudonyms() throws RemoteException;
+    JList<String> showTokenMappings() throws RemoteException;
+
+    String getMessage() throws RemoteException;
+}
 
 
