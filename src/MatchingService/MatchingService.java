@@ -248,16 +248,16 @@ public class MatchingService {
         ArrayList<Capsule> toRemove = new ArrayList<>();
 
         for (Capsule c: uninformedTokens) {
-            registrarImpl.sendRemainingUninformedTokens(c.getToken());
-
             //if uninformed is >= 2 days
             if(c.getUninformedTime().isBefore(LocalDateTime.now().minusMinutes(2))) {
-                toRemove.add(new Capsule(c));
+                registrarImpl.sendRemainingUninformedTokens(c.getToken());
+                toRemove.add(c);
+                informedTokens.add(new Capsule(c));
             }
         }
+
         for (Capsule c: toRemove) {
             uninformedTokens.remove(c);
-            informedTokens.add(new Capsule(c));
         }
     }
 
