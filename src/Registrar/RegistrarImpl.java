@@ -215,9 +215,10 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             StringBuilder sb = new StringBuilder();
             byte[] array = entry.getKey();
             String string = entry.getValue();
-            sb.append(array.toString());
+            sb.append("Phone number of user: ");
             sb.append(string);
-
+            sb.append(" Token: ");
+            sb.append(Arrays.toString(array));
             mappingModel.addElement(sb.toString());
         }
 
