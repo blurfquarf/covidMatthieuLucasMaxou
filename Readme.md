@@ -4,6 +4,7 @@
 
 
 Day is set to 2 minutes, 1 hour is 5 seconds!
+Uninformed users get sent to registrar only when they've been set uninformed for atleast a day!
 QR-code has to be copied correctly from catering terminal (no extra spaces).
 BTW-numbers should be unique!
 

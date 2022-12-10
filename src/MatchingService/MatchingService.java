@@ -237,7 +237,6 @@ public class MatchingService {
     }
 
 
-
     public static void main(String[] args) {
         MatchingService main =  new MatchingService();
         main.run();
