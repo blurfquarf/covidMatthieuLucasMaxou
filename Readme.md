@@ -5,6 +5,11 @@
 
 Day is set to 2 minutes, 1 hour is 5 seconds!
 QR-code has to be copied correctly from catering terminal (no extra spaces).
+BTW-numbers should be unique!
+
+DEMO:
+2 same place, 1 different
+3 same place (1 fetch tuples, 1 not)
 
 USAGE PROGRAM: 
 1) enroll caterings

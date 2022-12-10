@@ -187,7 +187,7 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
     public void sendRemainingUninformedTokens(byte[] token) throws RemoteException {
         for (Map.Entry<byte[], String> entry: tokenMappings.entrySet()) {
             if (Arrays.equals(entry.getKey(), token)) {
-                System.out.println("call " + entry.getValue() + ", to inform the user!");
+                System.out.println("Call " + entry.getValue() + ", to inform the user!");
             }
         }
     }
