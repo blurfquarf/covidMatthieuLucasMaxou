@@ -224,7 +224,7 @@ public class MatchingService {
                     infoLabel.setText("User awareness check performed!");
                     addNewComersToInformed();
                 } catch (RemoteException ex) {
-                    System.out.println("Er is iets fout gegaan bij het refreshen van de uninformed tokens!");
+                    System.out.println("Something went wrong with the refreshing of the uninformed tokens!");
                 } catch (NotBoundException ex) {
                     throw new RuntimeException(ex);
                 }
@@ -269,7 +269,7 @@ public class MatchingService {
 
         ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        //inlezen van arraylist met capsules ingezonden door mixingserver vanuit de MatchingServerImpl klasse
+        //inlezen van arraylist met capsules ingezonden door Mixingserver vanuit de MatchingServerImpl klasse
         ArrayList<byte[]> capsuleTokensMIX = matchingServerImpl.getMixingServerCapsuleListToken();
 
         ArrayList<byte[]> capsuleSignaturesMIX = matchingServerImpl.getMixingServerCapsuleListSignature();
@@ -312,7 +312,6 @@ public class MatchingService {
         // if there is already an entrye for that time & place => add token of user to that entry
         for(Capsule c : mixingServerCapsuleList) {
             System.out.println(mixingServerCapsuleList.size());
-            //System.out.println("time: "+c.getTime()+", hash: "+ Arrays.toString(c.getHash()) +", token: "+ Arrays.toString(c.getToken()) +", random:"+c.getRandom());
             ByteArrayHolder temp = new ByteArrayHolder(c.getTime(), c.getHash());
 
             //tijd en zaak er nog niet in => nieuwe entry
@@ -382,7 +381,7 @@ public class MatchingService {
             informedTokens.add(new Capsule(c.getToken(), c.getHash(), c.getTime(), LocalDateTime.now()));
         }
     }
-
+    //methodes om de inhoud van de matching service weer te geven
     public JList<String> showCapsules(ArrayList<Capsule> capsules){
         JList capsuleList = new JList<String>();
         DefaultListModel<String> capsuleModel = new DefaultListModel<>();

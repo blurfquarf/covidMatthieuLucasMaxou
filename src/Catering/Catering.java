@@ -33,7 +33,6 @@ public class Catering {
         Random rand = new Random();
         randomNumberQR = rand.nextInt(9999-1000) + 1000;
 
-        //int randomNumber=(int) (1000*Math.random());
 
         String pseudoniemstring = new String(pseudoniem, StandardCharsets.UTF_8);
 

@@ -109,7 +109,7 @@ public class MixingServer {
                     JList<String> list = mixingServerImpl.showTokens();
                     contentScrollPane.setViewportView(list);
                 } catch (RemoteException ex) {
-                    System.out.println("problem with showing used tokens");
+                    System.out.println("Problem with showing used tokens");
                     throw new RuntimeException(ex);
                 }
 
@@ -122,7 +122,7 @@ public class MixingServer {
                     JList<String> list = mixingServerImpl.showCapsules();
                     contentScrollPane.setViewportView(list);
                 } catch (RemoteException ex) {
-                    System.out.println("problem with showing capsules");
+                    System.out.println("Problem with showing capsules");
                     throw new RuntimeException(ex);
                 }
             }

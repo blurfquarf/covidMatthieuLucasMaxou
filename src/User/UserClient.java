@@ -27,17 +27,9 @@ import javax.swing.*;
 import javax.swing.text.html.HTMLDocument;
 
 public class UserClient implements ActionListener {
-    //TODO: functie om naar dokter te gaan als besmette patient : scchrijf alle logs (Token, Hash(Ri, pseudonym), Ri) + tijdstippen naar een file die de dokter dan kan uitlezen
-    // fase4: elke dag moet user lijst met critical tuples[hash(Ri, pseudonym), interval] opvragen
-    // checken of match met lokaal opgeslagen tuples
-    // if match: tokens uit die tuples naar mixing proxy sturen die ze dan doorstuurt nr de matching service die deze tokens dan als "informed" markeert
 
     private static String phoneNr;
-    //Lists with scanned QR codes, and the random number and id's of the visited catering facilties.
-    //These will be used when a user is contaminated, to search in the matching service.
-    //private ArrayList<String> scannedQRCodes = new ArrayList<>();
-    //private ArrayList<Integer> randomNumbers = new ArrayList<>();
-    //private ArrayList<Integer> idOfCateringFacilities = new ArrayList<>();
+
 
     private static PrivateKey privk;
     private static PublicKey pubk;
@@ -293,7 +285,6 @@ public class UserClient implements ActionListener {
                     send.setEnabled(false);
                     scan.setEnabled(false);
                     visit.setEnabled(false);
-                    //valid.setEnabled(false);
                     try {
                         if(scanned.get()){
                             String qrCode = new String(qr);
@@ -422,6 +413,7 @@ public class UserClient implements ActionListener {
         }
     }
 
+
     public static void writeLogs() throws IOException {
         BufferedWriter w = new BufferedWriter(new FileWriter("UserLogFile_"+ phoneNr));
         for (Map.Entry<LocalDateTime,Capsule> e : validUserCapsules.entrySet()) {
@@ -460,9 +452,7 @@ public class UserClient implements ActionListener {
         if(doesNotContain) visitEntries.put(LocalDateTime.now().toString(), new QROutput(q));
     }
 
-  /*  //public void addToScanned(String QRCode){
-        scannedQRCodes.add(QRCode);
-    }*/
+
 
     public static Map.Entry<byte[], byte[]> getToken() {
         Iterator<Map.Entry<byte[], byte[]>> it = tokens.entrySet().iterator();
@@ -473,6 +463,7 @@ public class UserClient implements ActionListener {
         }
         return entry;
     }
+
 
     public static int getMapSize() {
         return tokens.keySet().size();

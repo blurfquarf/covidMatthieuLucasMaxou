@@ -13,22 +13,14 @@ import java.nio.ByteBuffer;
 
 public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInterface {
 
-    //TODO: functie getPseudonyms(dag),
-    // aangemaakte pseudonymen opslaan + voor welke dag ze geldig zijn
-
-    //TODO: RMI fct voor matching service om "uninformed" usertokens door te sturen
-    // registrar moet deze users dan informeren
 
 
-    //String[] keyTime;
-    //HashMap<Business, String[]> identifier = new HashMap<>();
     PrivateKey mk;
     PublicKey pk;
     LocalDateTime timeSinceLastGeneratedToken;
 
 
     //lijsten stellen kolommen in databank voor
-    //private HashMap<Business, byte[]> secretKeys;
 
     private HashMap<String, LocalDateTime> timestamps;
     private ArrayList<ByteArrayHolder> pseudonyms;
