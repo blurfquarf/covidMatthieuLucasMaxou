@@ -377,7 +377,7 @@ public class MatchingService {
                 }
             }
         }
-        if (!uninformedTokens.contains(c)) {
+        if (!informedTokens.contains(c)) {
             informedTokens.add(new Capsule(c.getToken(), c.getHash(), c.getTime(), LocalDateTime.now()));
         }
     }
