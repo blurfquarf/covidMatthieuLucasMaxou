@@ -103,9 +103,6 @@ public class UserClient implements ActionListener {
             JFrame frame = new JFrame();
             JButton enroll = new JButton("Enroll");
 
-
-            //JButton valid = new JButton("Still valid?");
-
             //scan QR
             JButton scan = new JButton("Scan");
 
@@ -133,7 +130,6 @@ public class UserClient implements ActionListener {
             writeLogs.setEnabled(true);
             enroll.setEnabled(false);
             visit.setEnabled(false);
-            //valid.setEnabled(false);
             scan.setEnabled(false);
             send.setEnabled(true);
             getTokens.setEnabled(true);
@@ -160,9 +156,6 @@ public class UserClient implements ActionListener {
 
             /*1*/userPanel.add(numberField);
             /*2*/userPanel.add(enterQR);
-
-            //userPanel.add(valid);
-
             /*4*/userPanel.add(numberTextField);
             /*3*/userPanel.add(qrField);
             /*5*/userPanel.add(send);
@@ -304,11 +297,7 @@ public class UserClient implements ActionListener {
                     try {
                         if(scanned.get()){
                             String qrCode = new String(qr);
-                            //System.out.println(qrCode);
-                            //addToScanned(qrCode);
-                            //parseQRCodes();
                             visit(registrarImpl, mixingServerImpl, qr);
-                            //valid.setEnabled(true);
                         }
                         scan.setEnabled(true);
 

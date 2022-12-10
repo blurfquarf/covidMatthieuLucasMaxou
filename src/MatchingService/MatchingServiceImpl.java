@@ -19,16 +19,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 
 public class MatchingServiceImpl extends UnicastRemoteObject implements MatchingServiceInterface {
-    //TODO: rmi fct vooor docter: alle logs van een infected user doorsturen
-    // mbv rmi fct van registrar alle pseudonymen van een bepaalde dag op vragen
-    // validity van user logs checken door hash te nemen van Ri en pseudonym
-    // (kijken of een matcht door hash van RI en een van de pseuddonymen van registrar te hashen met hash gelever door user log)
-    // als match gevonden => alle capsules die die hash bevatten en in het interval van de besmette user aanwezig waren markeren als "critical"
-    // + Token van de user die dokter bezocht als "informed" markeren`
-
-    // TODO: na bepaald tijdsinterval vb 1 dag, overblijvende tokens ("uninformed") doorsturen naar registrar
-
-
     ArrayList<Capsule> mixingServerCapsuleList;
     ArrayList<Capsule> doctorCapsuleList;
     ArrayList<ByteArrayHolder> criticalTuples;

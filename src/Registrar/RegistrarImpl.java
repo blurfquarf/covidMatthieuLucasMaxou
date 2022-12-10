@@ -81,18 +81,12 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
         SecretKeyFactory keyFac = SecretKeyFactory.getInstance("PBEWithHmacSHA256AndAES_256");
         LocalDateTime currentMoment = LocalDateTime.now().plusMinutes(i);
         String tempDay = currentMoment.toString();
-
-
         char[] moment = tempDay.toCharArray();
-
-        //System.out.println(moment);
-
         byte[] ID = (mk + String.valueOf(btw)).getBytes();
 
 
         PBEKeySpec pbeKeySpec = new PBEKeySpec(moment, ID, 1000);
 
-        //SecretKey finalSecret = keyFac.generateSecret(pbeKeySpec);
         return keyFac.generateSecret(pbeKeySpec);
 
 }
@@ -158,7 +152,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
 
             //bijhouden welke tokens bij welke user horen
             tokenMappings.put(token, telefoonnr);
-            //System.out.println("token added: "+Arrays.toString(token)+" for user: "+ telefoonnr);
         }
         timeSinceLastGeneratedToken=now;
         return ts;

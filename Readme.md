@@ -3,6 +3,8 @@
 **Made by: Matthieu De Langhe, Maxou Van Lauwe, Lucas Van Der Stuyft**
 
 
+Day is set to 2 minutes, 1 hour is 5 seconds!
+
 USAGE PROGRAM: 
 1) enroll caterings
 2) enroll Users

@@ -197,14 +197,4 @@ public class MixingServerImpl extends UnicastRemoteObject implements MixingServe
 
         matchingServerImpl.sendHashesTokensTimes(hash, token, localDateTime);
     }
-
-
-
-
-
-
-
-
-
-
 }

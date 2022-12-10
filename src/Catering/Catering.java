@@ -19,8 +19,6 @@ public class Catering {
     private static int randomNumberQR;
 
 
-
-
     //creating a bitstring
     static String toBinary(byte[] bytes)
     {
@@ -29,9 +27,6 @@ public class Catering {
             sb.append((bytes[i / Byte.SIZE] << i % Byte.SIZE & 0x80) == 0 ? '0' : '1');
         return sb.toString();
     }
-
-
-
 
     public static String generateQRCode(int btw, byte[] pseudoniem) throws NoSuchAlgorithmException{
         //random nummer max 4 cijfers
@@ -145,8 +140,6 @@ public class Catering {
                         //where is this catering in its cycle of 7 days
                         day = 1;
 
-
-
                         //pseudonym changes with derivedKey
                         for (byte[] s : derivedKeys) {
                             //for every key in the list we use 1 every minute (read day)
@@ -165,8 +158,6 @@ public class Catering {
                             //should be 120000
                             Thread.sleep(120000);
                         }
-
-
                     }
                 } catch (Exception e) {
                     throw new RuntimeException(e);
