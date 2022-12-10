@@ -11,18 +11,22 @@ DEMO:
 2 same place, 1 different/3 same place (1 fetch tuples, 1 not)
 
 USAGE PROGRAM: 
-1) enroll caterings
-2) enroll Users
-3) Perform User visits (scan QR code from catering facility)
-4) write out logs for doctor @infected user
-5) doctor reads log file of the infected user + send files to matching server
-6) show content of mixing server
-7) flush content of mixing server to matching server
-8) show mixing server content again (now empty)
-9) check infected users @matching server
-10) show content of matching server
-11) update critical tuples
-12) @user2 fetch critical tuples
-13) @matching server refresh newcomers
-14) show content matching server content (now 2 informed + 1 uninformed user)
-15) @registrar contact still uninformed users (after 2 days) => see registrar terminal
+  Startup:
+  registrar, mixing server, matching server, catering, user, doctor
+
+  Sequence:
+  1) enroll caterings
+  2) enroll Users
+  3) Perform User visits (scan QR code from catering facility)
+  4) write out logs for doctor @infected user
+  5) doctor reads log file of the infected user + send files to matching server
+  6) show content of mixing server
+  7) flush content of mixing server to matching server
+  8) show mixing server content again (now empty)
+  9) check infected users @matching server
+  10) show content of matching server
+  11) update critical tuples
+  12) @user2 fetch critical tuples
+  13) @matching server refresh newcomers
+  14) show content matching server content (now 2 informed + 1 uninformed user)
+  15) @registrar contact still uninformed users (after 2 days) => see registrar terminal
