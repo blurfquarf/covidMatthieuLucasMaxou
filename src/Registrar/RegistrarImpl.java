@@ -139,8 +139,6 @@ public class RegistrarImpl extends UnicastRemoteObject implements RegistrarInter
             signatureEngine.initSign(mk);
             signatureEngine.update(token);
 
-
-            //TODO ADD CURRENT DAY (2min period)
             byte[] signature = signatureEngine.sign();
 
             ts.put(token, signature);
