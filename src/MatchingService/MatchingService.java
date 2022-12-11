@@ -114,7 +114,7 @@ public class MatchingService {
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    infoLabel.setText("2 day old uninformed users available for registrar to contact! (see registrar terminal)");
+                    infoLabel.setText("2 day old uninformed users available for registrar to contact! (numbers to call visible in registrar)");
                     sendRemainingUninformedTokensTimes();
                 } catch (RemoteException | NotBoundException ex) {
                     throw new RuntimeException(ex);
