@@ -8,7 +8,7 @@ Uninformed users get sent to registrar only when they've been set uninformed for
 Old usertokens are flushed when a day passes.
 QR-code has to be copied correctly from catering terminal (no extra spaces).
 BTW-numbers should be unique!
-Doctor should remove user file after sending it's info to the matching server.
+The doctor should remove user file after sending it's info to the matching server.
 
 DEMO:
 2 same place, 1 different/3 same place (1 fetch tuples, 1 not)
