@@ -144,8 +144,6 @@ public class DoctorClient {
                         try {
                             matchingServiceImpl.sendFromDoctor(time, hash, token, signature, random, completePacket, completePacketSignature, name);
                             System.out.println("Sent hash: " + Arrays.toString(hash));
-
-
                         } catch (RemoteException | NotBoundException | NoSuchAlgorithmException | SignatureException |
                                  InvalidKeyException ex){
                             throw new RuntimeException(ex);
@@ -153,6 +151,7 @@ public class DoctorClient {
                         readField.setText("Data sent to matching service! Please remove the userfile.");
                         send.setEnabled(false);
                     }
+                    userLogCapsules.clear();
                 }
             });
         }catch (Exception e){
