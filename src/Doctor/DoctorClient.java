@@ -150,7 +150,7 @@ public class DoctorClient {
                                  InvalidKeyException ex){
                             throw new RuntimeException(ex);
                         }
-                        readField.setText("Data sent to matching service!");
+                        readField.setText("Data sent to matching service! Please remove the userfile.");
                         send.setEnabled(false);
                     }
                 }
@@ -163,19 +163,20 @@ public class DoctorClient {
     /////////GUI/////////
 
     public void readUserLogs(String path) throws FileNotFoundException {
-        System.out.println(path);
         File text = new File(path);
         Scanner sc = new Scanner(text);
         //time,token,signature,hash,random
-        String[] line = sc.nextLine().split(",");
-        DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
-        LocalDateTime time = LocalDateTime.parse(line[0].substring(0, line[0].length()-7), f);
-        byte[] token = new BigInteger(line[1], 2).toByteArray();
-        byte[] signature = new BigInteger(line[2], 2).toByteArray();
-        byte[] hash = new BigInteger(line[3], 2).toByteArray();
-        int random = Integer.parseInt(line[4]);
+        while(sc.hasNextLine()) {
+            String[] line = sc.nextLine().split(",");
+            DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+            LocalDateTime time = LocalDateTime.parse(line[0].substring(0, line[0].length()-7), f);
+            byte[] token = new BigInteger(line[1], 2).toByteArray();
+            byte[] signature = new BigInteger(line[2], 2).toByteArray();
+            byte[] hash = new BigInteger(line[3], 2).toByteArray();
+            int random = Integer.parseInt(line[4]);
 
-        userLogCapsules.add(new Capsule(token, signature, hash, random, time));
+            userLogCapsules.add(new Capsule(token, signature, hash, random, time));
+        }
     }
 
 
