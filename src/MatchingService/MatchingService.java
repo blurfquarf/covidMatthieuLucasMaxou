@@ -47,6 +47,8 @@ public class MatchingService {
 
     JButton forwardToRegistrar = new JButton("Forward remaining uninformed tuples to registrar! These people haven't responded within 2 days of being critical!");
 
+    JButton clearDB = new JButton("Remove expired entries");
+
     JLabel infoLabel = new JLabel("");
 
 
@@ -93,12 +95,21 @@ public class MatchingService {
         userPanel.add(forwardToRegistrar);
         forwardToRegistrar.setEnabled(true);
 
+        userPanel.add(clearDB);
+        clearDB.setEnabled(true);
+
         userPanel.add(infoLabel);
 
         frame.add(userPanel,BorderLayout.CENTER);
         frame.setVisible(true);
 
-
+        clearDB.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                infoLabel.setText("Expired entries have been removed from the database");
+                removeExpiredEntries();
+            }
+        });
 
         forwardToRegistrar.addActionListener(new ActionListener() {
             @Override
@@ -240,6 +251,50 @@ public class MatchingService {
     public static void main(String[] args) {
         MatchingService main =  new MatchingService();
         main.run();
+    }
+
+    public void removeExpiredEntries() {
+        ArrayList<ByteArrayHolder> toRemove = new ArrayList<>();
+        ArrayList<ByteArrayHolder> toRemoveCE = new ArrayList<>();
+        ArrayList<Capsule> toRemoveMSC = new ArrayList<>();
+        ArrayList<Capsule> toRemoveDC = new ArrayList<>();
+        LocalDateTime treshold  = LocalDateTime.now().minusMinutes(10);
+        for (ByteArrayHolder b : allEntries.keySet()) {
+            if(b.getTime().isBefore(treshold)){
+                toRemove.add(b);
+            }
+        }
+        for (ByteArrayHolder ce: criticalEntries) {
+            if (ce.getTime().isBefore(treshold)) {
+                toRemoveCE.add(ce);
+            }
+        }
+        for (Capsule mc:mixingServerCapsuleList) {
+            if (mc.getTime().isBefore(treshold)) {
+                toRemoveMSC.add(mc);
+            }
+        }
+        for (Capsule dc: doctorCapsuleList) {
+            if (dc.getTime().isBefore(treshold)) {
+                toRemoveDC.add(dc);
+            }
+        }
+        for (ByteArrayHolder b: toRemove) {
+            for (Capsule c: allEntries.get(b)) {
+                uninformedTokens.remove(c);
+                informedTokens.remove(c);
+            }
+            allEntries.remove(b);
+        }
+        for (Capsule c:toRemoveDC) {
+            doctorCapsuleList.remove(c);
+        }
+        for(Capsule c: toRemoveMSC) {
+            mixingServerCapsuleList.remove(c);
+        }
+        for (ByteArrayHolder b: toRemoveCE) {
+            criticalEntries.remove(b);
+        }
     }
 
     public void sendRemainingUninformedTokensTimes() throws RemoteException, NotBoundException {
