@@ -106,7 +106,7 @@ public class MatchingService {
         clearDB.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                infoLabel.setText("Expired entries have been removed from the database");
+                infoLabel.setText("Expired entries have been removed from the database!");
                 removeExpiredEntries();
             }
         });
@@ -433,6 +433,7 @@ public class MatchingService {
         }
         if (!informedTokens.contains(c)) {
             informedTokens.add(new Capsule(c.getToken(), c.getHash(), c.getTime(), LocalDateTime.now()));
+            uninformedTokens.remove(c);
         }
     }
     //methodes om de inhoud van de matching service weer te geven

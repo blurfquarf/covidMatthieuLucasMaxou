@@ -54,6 +54,8 @@ public class UserClient implements ActionListener {
 
     private static ArrayList<LocalDateTime> times;
 
+    private static String time;
+
 
     private static QROutput q;
     private static String qr = "";
@@ -199,7 +201,7 @@ public class UserClient implements ActionListener {
                 public void actionPerformed(ActionEvent e) {
                     try {
                         writeLogs();
-                        writeLogsLabel.setText("Logs written to file for doctor! Get inside and stay clear from others! File for doctor: " + System.getProperty("user.dir") + "/" +  "UserLogFile_" + phoneNr);
+                        writeLogsLabel.setText("Logs written to file for doctor! Get inside and stay clear from others! File for doctor: " + System.getProperty("user.dir") + "/" +  "UserLogFile_" + phoneNr + time);
                         writeLogsLabel.setBackground(Color.red);
                     } catch (IOException ex) {
                         throw new RuntimeException(ex);
@@ -415,7 +417,8 @@ public class UserClient implements ActionListener {
 
 
     public static void writeLogs() throws IOException {
-        BufferedWriter w = new BufferedWriter(new FileWriter("UserLogFile_"+ phoneNr));
+        time = LocalDateTime.now().toString();
+        BufferedWriter w = new BufferedWriter(new FileWriter("UserLogFile_"+ phoneNr + time));
         for (Map.Entry<LocalDateTime,Capsule> e : validUserCapsules.entrySet()) {
             //enkel de logs van de laatste 5 dagen doorsturen naar de dokter
             if(e.getKey().isAfter(LocalDateTime.now().minusMinutes(10)) && e.getKey().isBefore(LocalDateTime.now()) ) {
