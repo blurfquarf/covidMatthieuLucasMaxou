@@ -17,7 +17,7 @@ USAGE PROGRAM:
   Startup:
   registrar, mixing server, matching server, catering, user, doctor
 
-  Sequence:
+  Simple example sequence:
   1) enroll caterings
   2) enroll Users
   3) Perform User visits (scan QR code from catering facility)
